@@ -1,14 +1,12 @@
+//HTTPサーバ
+
 var http       = require('http');
 
 var port = 8080;
-var hostname = '127.0.0.1';
 
 http.createServer(function (request, response) {
-	response.writeHead(200, {
-		'Content-Type': 'text/plain;charset=UTF-8' ,
-	});
+	response.writeHead(200, {'Content-Type': 'text/plain;charset=UTF-8'});
 	response.end('ハロー');
-
-}).listen(port, hostname, function () {
-    console.log('listen');
+}).listen(port, function () {
+    console.log('ポート' + port + 'でHTTP接続待ち受け開始');
 });
