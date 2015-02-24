@@ -1,8 +1,9 @@
 //HTTPサーバ
 
-var http       = require('http');
+var http = require('http');
 
-var port = 8080;
+var config = require('./config.json');
+var port = config.port || 80;
 
 http.createServer(function (request, response) {
 	response.writeHead(200, {'Content-Type': 'text/plain;charset=UTF-8'});
