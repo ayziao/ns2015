@@ -44,29 +44,37 @@ function staticFileRead(filePath, hit, nothing){
 	});
 }
 
+function accessLog(log){
+	//TODO アパッチ形式でファイルに書き出したりできるように	
+	console.log(log);
+}
+
+function errorLog(log){
+	//TODO アパッチ形式でファイルに書き出したりできるように	
+	console.log(log);
+}
+
 //静的ファイル返送
 function staticResponse(requestUrl, response){
 	var filePath = staticDir + 'default' + requestUrl;
 	var extname  = path.extname(requestUrl).replace(".", '');
+	var statusCode = 200;
 
 	staticFileRead(filePath ,function (buf) { //ファイルあり
-		statusCode = 200;
 		response.writeHead(statusCode, {"Content-Type": contentType[extname]});
 		response.end(buf);
 
-	} ,function () { //ファイルなし
+	}, function () { //ファイルなし
 		statusCode = 404;
 		response.writeHead(statusCode, {'Content-Type': contentType['txt']});
 		response.end(statusCode + ' ' + httpStatus[statusCode]);
-	});	
+	});
 
 	return 'readFile:' + filePath;
-}	
+}
 
 //HTTPサーバ起動
 http.createServer(function (request, response) {
-
-	console.log(request);
 
 	var statusCode = 200;
 	var requestTime = new Date();
