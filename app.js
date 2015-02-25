@@ -24,7 +24,7 @@ var contentType = {
 	png  : 'image/png' ,
 	ico  : 'image/vnd.microsoft.icon' ,
 	txt  : 'text/plain;charset=UTF-8'
-}; 
+};
 
 //モジュール
 var fs   = require('fs');
@@ -94,12 +94,13 @@ http.createServer(function (request, response) {
 		response.writeHead(statusCode, {'Content-Type': 'text/plain;charset=UTF-8'});
 		response.end(statusCode + httpStatus[statusCode]);
 	}
-	console.log(requestTime + ' ' + request.headers.host + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
+	accessLog(requestTime + ' ' + request.headers.host + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
 
 }).listen(port, function () {
     console.log('ポート' + port + 'でHTTP接続待ち受け開始');
-    if(port < 1025){
-	    console.log('実行ユーザを' + user + 'に変更');
+    if(port < 1025 && user != 'root'){
 	    process.setuid(user);
+	    console.log('実行ユーザを' + user + 'に変更');
     }
+
 });
