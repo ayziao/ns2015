@@ -35,22 +35,21 @@ var http = require('http');
 function staticFileRead(filePath, hit, nothing){
 	fs.readFile(filePath, function (err, buf) {
 		if (err) { //ファイル無し
-			console.log(err);
+			errorLog(err);
 			nothing();
 		} else { //ファイルあり
-			//console.log(buf);
 			hit(buf);
 		}
 	});
 }
 
 function accessLog(log){
-	//TODO アパッチ形式でファイルに書き出したりできるように	
+	//TODO apache形式でファイルに書き出したりできるように	
 	console.log(log);
 }
 
 function errorLog(log){
-	//TODO アパッチ形式でファイルに書き出したりできるように	
+	//TODO apache形式でファイルに書き出したりできるように	
 	console.log(log);
 }
 
@@ -84,8 +83,10 @@ http.createServer(function (request, response) {
 		if (request.url == '/') { //トップへのアクセス
 			response.writeHead(200, {'Content-Type': 'text/plain;charset=UTF-8'});
 			response.end('ハロー');
+			//TODO ダッシュボード
 
 		} else { //トップ以外は静的ファイルを探す
+			//TODO コマンド
 			msg += ' ' + staticResponse(request.url, response);
 		}
 
