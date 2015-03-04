@@ -1,6 +1,7 @@
 //アプリケーション
 
 //設定
+//PENDING 動的な設定変更を設定ファルでやるか？DBの設定テーブルでやるか？
 var config    = require('./config.json');
 var port      = config.port      || 80;
 var user      = config.user      || 'node';
@@ -26,10 +27,15 @@ var contentType = {
 	txt  : 'text/plain;charset=UTF-8'
 };
 
-//モジュール
+//コアモジュール
 var fs   = require('fs');
 var path = require('path');
 var http = require('http');
+
+//npm : Node Package Manager
+
+//自作モジュール
+var ns   = require('./ns');
 
 //静的ファイル読み込み
 function staticFileRead(filePath, hit, nothing){

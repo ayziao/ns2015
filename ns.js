@@ -1,0 +1,5 @@
+//ニアスケイプモジュール
+
+module.exports = function () {
+
+}
