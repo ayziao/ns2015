@@ -1,5 +1,9 @@
 {
-	"port"      : 80,
-	"user"      : "node",
-	"staticDir" : "./static/"
+	"http" : {
+		"port" : 80 ,
+		"user" : "node" 
+	} ,
+	"ns" : {
+		"staticDir" : "./static/test/"
+	}
 }

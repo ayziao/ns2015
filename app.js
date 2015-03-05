@@ -2,9 +2,9 @@
 //httpサーバ起動するだけ
 
 //設定
-var config    = require('./config.json');
-var port      = config.port      || 80;
-var user      = config.user      || 'node';
+var config    = require('./config.json').http;
+var port      = config.port || 80;
+var user      = config.user || 'node';
 
 //コアモジュール
 var http = require('http');

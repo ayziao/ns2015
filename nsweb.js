@@ -2,7 +2,7 @@
 
 //設定
 //PENDING 動的な設定変更を設定ファルでやるか？DBの設定テーブルでやるか？
-var config    = require('./config.json');
+var config    = require('./config.json').ns;
 var staticDir = config.staticDir || './static/';
 
 //定数的なの
@@ -68,7 +68,7 @@ function staticResponse(requestUrl, response){
 		response.end(buf);
 
 	}, function () { //ファイルなし
-		statusCode = 404;
+		statusCode = 404; //TODO アクセスログへ渡るようにどうにか
 		response.writeHead(statusCode, {'Content-Type': contentType['txt']});
 		response.end(statusCode + ' ' + httpStatus[statusCode]);
 	});
@@ -82,6 +82,10 @@ module.exports = function (request, response) {
 	var requestTime = new Date();
 	var msg = '';
 
+	//TODO コマンドテーブルチェック
+	//TODO 静的ファイルチェック
+	//TODO データテーブルチェック
+
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
 			response.writeHead(200, {'Content-Type': 'text/plain;charset=UTF-8'});
@@ -90,7 +94,6 @@ module.exports = function (request, response) {
 			//TODO ダッシュボード
 
 		} else { //トップ以外は静的ファイルを探す
-			//TODO コマンド
 			msg += ' ' + staticResponse(request.url, response);
 		}
 
