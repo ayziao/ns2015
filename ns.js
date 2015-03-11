@@ -1,11 +1,13 @@
 //ニアスケイプモジュール
 
-//文字列と表示形式を受け取って返す
+//文字列と表示形式を受け取ってコールバックに渡す
 
-//トップ
+//コンテント取得
+function getContent(str,type,callback){
+	callback(null,'ハロー');
+}
 
 //投稿
-
-
-module.exports = function () {
+module.exports = {
+	getContent : getContent
 }

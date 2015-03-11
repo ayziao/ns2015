@@ -4,6 +4,6 @@
 		"user" : "node" 
 	} ,
 	"ns" : {
-		"staticDir" : "./static/test/"
+		"staticDir" : "./static/"
 	}
 }
