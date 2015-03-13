@@ -4,6 +4,7 @@
 		"user" : "node" 
 	} ,
 	"ns" : {
-		"staticDir" : "./static/"
+		"staticDir" : "./static/" ,
+		"db" : "./db.sqlite3"
 	}
 }
