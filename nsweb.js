@@ -36,10 +36,10 @@ var http = require('http');
 //自作モジュール
 var ns = require('./ns');
 
-function accessLog(log){
+function accessLog(logs){
 	//PENDING クラス化が必要では
 	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(log);
+	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.useragent + logs.msg);
 }
 
 function errorLog(log){
@@ -54,16 +54,26 @@ module.exports = function (request, response) {
 	var requestTime = new Date();
 	var msg = '';
 
+	var logs = {
+		requestTime : requestTime ,
+		host : request.headers.host ,
+		url : request.url ,
+		useragent : request.headers['user-agent'] ,
+		msg : '' ,
+		statusCode : statusCode
+	}
+
+
 	//TODO コマンドテーブルチェック
 	//TODO 静的ファイルチェック
 	//TODO データテーブルチェック
 
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
-			ns.getContent('/','txt',function(err,content){
+			ns.dashboard('/','txt',function(err,content){
 				response.writeHead(200, {'Content-Type': contentType['txt']});
 				response.end(content);
-				accessLog(requestTime + ' ' + request.headers.host + ' ' + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
+				accessLog(logs);
 			});
 		} else { //トップ以外は静的ファイルを探す
 			var filePath = staticDir + 'default' + request.url;
@@ -71,25 +81,34 @@ module.exports = function (request, response) {
 			fs.readFile(filePath, function (err, buf) {
 				if (err) { //ファイル無し
 					//TODO コンテント取得
-
-					//静的ファイルもコンテントも無い場合404
-					statusCode = 404;
-					response.writeHead(statusCode, {'Content-Type': contentType['txt']});
-					response.end(statusCode + ' ' + httpStatus[statusCode]);
-					accessLog(requestTime + ' ' + request.headers.host + ' ' + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
+					ns.content(request.url.slice(1),'txt',function(err,content){
+						if (content != null){
+							response.writeHead(200, {'Content-Type': contentType['txt']});
+							response.end(content);
+							accessLog(logs);
+						} else {
+							//静的ファイルもコンテントも無い場合404
+							statusCode = 404;
+							logs.statusCode = statusCode;
+							response.writeHead(statusCode, {'Content-Type': contentType['txt']});
+							response.end(statusCode + ' ' + httpStatus[statusCode]);
+							accessLog(logs);
+						}
+					});
 				} else { //ファイルあり
 					var extname  = path.extname(request.url).replace(".", '');
 					response.writeHead(statusCode, {"Content-Type": contentType[extname]});
 					response.end(buf);
-					accessLog(requestTime + ' ' + request.headers.host + ' ' + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
+					accessLog(logs);
 				}
 			});
 		}
 
 	} else { //非許可HTTPメソッドは403
 		statusCode = 403;
+		logs.statusCode = statusCode;
 		response.writeHead(statusCode, {'Content-Type': 'text/plain;charset=UTF-8'});
 		response.end(statusCode + httpStatus[statusCode]);
-		accessLog(requestTime + ' ' + request.headers.host + request.url + ' ' + statusCode + httpStatus[statusCode] + ' ' + request.headers['user-agent'] + msg);
+		accessLog(logs);
 	}
 }

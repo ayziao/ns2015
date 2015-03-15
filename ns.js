@@ -7,25 +7,43 @@ var dbf = config.db || 'db.sqlite3';
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database(dbf);
 
+db.on("trace", function(sql) {
+  console.log(sql);
+});
 
-//コンテント取得
-function getContent(str,type,callback){
 
+//ダッシュボード	
+function dashboard(str,type,callback){
 	db.serialize(function(){
 		var user = 'test';
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 10";
 		db.all(sql, function(err, rows){
 			if (!err) {
-			    console.log(rows);
+				callback(null,JSON.stringify(rows));
+			} else {
+				callback(err,null);
 			}
 		}); 
-	    console.log(sql);
 	});
+}
 
-	callback(null,'ハロー');
+//コンテント取得
+function content(str,type,callback){
+	db.serialize(function(){
+		var user = 'test';
+		var sql = "SELECT * FROM basedata WHERE identifier = '"+ str +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";
+		db.all(sql, function(err, rows){
+			if (!err) {
+				callback(null,JSON.stringify(rows[0]));
+			} else {
+				callback(err,null);
+			}
+		}); 
+	});
 }
 
 //投稿
 module.exports = {
-	getContent : getContent
+	dashboard  : dashboard ,
+	content : content
 }
