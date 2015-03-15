@@ -1,16 +1,32 @@
-//ニアスケイプモジュール
-//文字列と表示形式を受け取ってコールバックに渡す
+/**
+ * ニアスケイプモジュール
+ *
+ * 文字列と表示形式を受け取ってコールバックに渡す
+ */
 
+
+/**
+ * 設定
+ */
 var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
 
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database(dbf);
 
+/**
+ * モジュール
+ */
+//npm : Node Package Manager
+var sqlite3 = require('sqlite3').verbose();
+
+var db = new sqlite3.Database(dbf);
 db.on("trace", function(sql) {
   console.log(sql);
 });
 
+
+/**
+ * 関数定義
+ */
 
 //ダッシュボード	
 function dashboard(str,type,callback){
@@ -42,7 +58,12 @@ function content(str,type,callback){
 	});
 }
 
-//投稿
+//TODO 投稿
+
+
+/**
+ * エクスポート
+ */
 module.exports = {
 	dashboard  : dashboard ,
 	content : content

@@ -1,12 +1,21 @@
-//ニアスケイプwebモジュール
-//node以外での利用は考慮しない
+/**
+ * ニアスケイプwebモジュール
+ *
+ * node以外での利用は考慮しない
+ */
 
-//設定
+
+/**
+ * 設定
+ */
 //PENDING 動的な設定変更を設定ファルでやるか？DBの設定テーブルでやるか？
 var config    = require('./config.json').ns;
 var staticDir = config.staticDir || './static/';
 
-//定数的なの
+
+/**
+ * 定数的なの
+ */
 var httpStatus = {
 	200 : ' OK',
 	403 : ' Forbidden',
@@ -26,6 +35,11 @@ var contentType = {
 	txt  : 'text/plain;charset=UTF-8' ,
 };
 
+
+/**
+ * モジュール
+ */
+
 //nodeコアモジュール
 var fs   = require('fs');
 var path = require('path');
@@ -36,19 +50,11 @@ var http = require('http');
 //自作モジュール
 var ns = require('./ns');
 
-function accessLog(logs){
-	//PENDING クラス化が必要では
-	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.useragent + logs.msg);
-}
 
-function errorLog(log){
-	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(log);
-}
-
-
-module.exports = function (request, response) {
+/**
+ * ニアスケイプwebモジュール本体
+ */
+function nsweb(request, response) {
 
 	var statusCode = 200;
 	var requestTime = new Date();
@@ -80,7 +86,6 @@ module.exports = function (request, response) {
 			msg += ' readFile:' + filePath;
 			fs.readFile(filePath, function (err, buf) {
 				if (err) { //ファイル無し
-					//TODO コンテント取得
 					ns.content(request.url.slice(1),'txt',function(err,content){
 						if (content != null){
 							response.writeHead(200, {'Content-Type': contentType['txt']});
@@ -112,3 +117,24 @@ module.exports = function (request, response) {
 		accessLog(logs);
 	}
 }
+
+
+/**
+ * モジュール内関数
+ */
+function accessLog(logs){
+	//PENDING クラス化が必要では
+	//TODO apache形式でファイルに書き出したりできるように	
+	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.useragent + logs.msg);
+}
+
+function errorLog(log){
+	//TODO apache形式でファイルに書き出したりできるように	
+	console.log(log);
+}
+
+
+/**
+ * エクスポート
+ */
+module.exports = nsweb;
