@@ -35,7 +35,7 @@ function dashboard(str,type,callback){
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 10";
 		db.all(sql, function(err, rows){
 			if (!err) {
-				callback(null,JSON.stringify(rows));
+				callback(null,JSON.stringify(rows,null,"\t"));
 			} else {
 				callback(err,null);
 			}
@@ -50,7 +50,7 @@ function content(str,type,callback){
 		var sql = "SELECT * FROM basedata WHERE identifier = '"+ str +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";
 		db.all(sql, function(err, rows){
 			if (!err) {
-				callback(null,JSON.stringify(rows[0]));
+				callback(null,JSON.stringify(rows[0],null,"\t"));
 			} else {
 				callback(err,null);
 			}
