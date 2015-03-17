@@ -56,19 +56,14 @@ var ns = require('./ns');
  */
 function nsweb(request, response) {
 
-	var statusCode = 200;
-	var requestTime = new Date();
-	var msg = '';
-
 	var logs = {
-		requestTime : requestTime ,
+		requestTime : new Date() ,
 		host : request.headers.host ,
 		url : request.url ,
-		useragent : request.headers['user-agent'] ,
+		userAgent : request.headers['user-agent'] ,
 		msg : '' ,
-		statusCode : statusCode
+		statusCode : 200
 	}
-
 
 	//TODO コマンドテーブルチェック
 	//TODO 静的ファイルチェック
@@ -83,7 +78,7 @@ function nsweb(request, response) {
 			});
 		} else { //トップ以外は静的ファイルを探す
 			var filePath = staticDir + 'default' + request.url;
-			msg += ' readFile:' + filePath;
+			logs.msg += ' readFile:' + filePath;
 			fs.readFile(filePath, function (err, buf) {
 				if (err) { //ファイル無し
 					ns.content(request.url.slice(1),'txt',function(err,content){
@@ -93,7 +88,7 @@ function nsweb(request, response) {
 							accessLog(logs);
 						} else {
 							//静的ファイルもコンテントも無い場合404
-							statusCode = 404;
+							var statusCode = 404;
 							logs.statusCode = statusCode;
 							response.writeHead(statusCode, {'Content-Type': contentType['txt']});
 							response.end(statusCode + ' ' + httpStatus[statusCode]);
@@ -102,7 +97,7 @@ function nsweb(request, response) {
 					});
 				} else { //ファイルあり
 					var extname  = path.extname(request.url).replace(".", '');
-					response.writeHead(statusCode, {"Content-Type": contentType[extname]});
+					response.writeHead(200, {"Content-Type": contentType[extname]});
 					response.end(buf);
 					accessLog(logs);
 				}
@@ -110,7 +105,7 @@ function nsweb(request, response) {
 		}
 
 	} else { //非許可HTTPメソッドは403
-		statusCode = 403;
+		var statusCode = 403;
 		logs.statusCode = statusCode;
 		response.writeHead(statusCode, {'Content-Type': 'text/plain;charset=UTF-8'});
 		response.end(statusCode + httpStatus[statusCode]);
@@ -125,7 +120,7 @@ function nsweb(request, response) {
 function accessLog(logs){
 	//PENDING クラス化が必要では
 	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.useragent + logs.msg);
+	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
 }
 
 function errorLog(log){
