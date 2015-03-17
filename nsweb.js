@@ -76,7 +76,7 @@ function nsweb(request, response) {
 
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
-			ns.dashboard('/','txt',function(err,content){
+			ns.timeline('/','txt',function(err,content){
 				response.writeHead(200, {'Content-Type': contentType['txt']});
 				response.end(content);
 				accessLog(logs);

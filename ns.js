@@ -28,8 +28,8 @@ db.on("trace", function(sql) {
  * 関数定義
  */
 
-//ダッシュボード	
-function dashboard(str,type,callback){
+//timeline	
+function timeline(str,type,callback){
 	db.serialize(function(){
 		var user = 'test';
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 10";
@@ -65,6 +65,6 @@ function content(str,type,callback){
  * エクスポート
  */
 module.exports = {
-	dashboard  : dashboard ,
-	content : content
+	timeline : timeline ,
+	content  : content
 }
