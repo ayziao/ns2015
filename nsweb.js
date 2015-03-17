@@ -1,7 +1,8 @@
 /**
  * ニアスケイプwebモジュール
  * 
- * HTTPに関わるところを処理する HTMLはコマンドラインでも使うのでns本体でやる
+ * HTTPに関わるところを処理する HTTPヘッダとかレスポンス処理とかHTTPのアクセスログとか
+ * HTMLはコマンドラインでも使うのでns本体でやる
  *
  * node以外での利用は考慮しない
  */
@@ -75,6 +76,7 @@ function nsweb(request, response) {
 
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
+			//タイムライン //TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
 			ns.timeline('/','txt',function(err,content){
 				response.writeHead(200, {'Content-Type': contentType['txt']});
 				response.end(content);
@@ -115,6 +117,17 @@ function nsweb(request, response) {
 		response.end(statusCode + httpStatus[statusCode]);
 		accessLog(logs);
 	}
+
+
+//TODO あとで消す デバッグ用
+	console.log(request.headers);
+	console.log('httpVersion : %s',request.httpVersion);
+	console.log('url : %s',request.url);
+	console.log('method : %s',request.method);
+	console.log('idleStart : %s',request.client._idleStart);
+	console.log('monotonicStartTime : %s',request.client._monotonicStartTime);
+
+	//console.log(request);
 }
 
 
