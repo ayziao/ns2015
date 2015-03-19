@@ -68,11 +68,11 @@ function nsweb(request, response) {
 
 	var logs = {
 		requestTime : new Date() ,
-		host : request.headers.host ,
-		url : request.url ,
-		userAgent : request.headers['user-agent'] ,
-		msg : '' ,
-		statusCode : 200
+		host        : request.headers.host ,
+		url         : request.url ,
+		userAgent   : request.headers['user-agent'] ,
+		msg         : '' ,
+		statusCode  : 200
 	}
 
 	//TODO コマンドテーブルチェック
@@ -128,12 +128,12 @@ function nsweb(request, response) {
  * モジュール内関数
  */
 function accessLog(logs){
-	//PENDING クラス化が必要では
 	//TODO apache形式でファイルに書き出したりできるように	
 	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
 }
 
 function errorLog(log){
+	//TODO オブジェクト受け取るようにする
 	//TODO apache形式でファイルに書き出したりできるように	
 	console.log(log);
 }
