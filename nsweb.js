@@ -55,6 +55,11 @@ var http = require('http');
 //自作モジュール
 var ns = require('./ns');
 
+function returnResponse(response,statusCode,content,contentType,logs){
+	response.writeHead(statusCode, {'Content-Type': contentType[contentType]});
+	response.end(content);
+	accessLog(logs);
+}
 
 /**
  * ニアスケイプwebモジュール本体
@@ -78,9 +83,7 @@ function nsweb(request, response) {
 		if (request.url == '/') { //トップへのアクセス
 			//タイムライン //TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
 			ns.timeline('/','txt',function(err,content){
-				response.writeHead(200, {'Content-Type': contentType['txt']});
-				response.end(content);
-				accessLog(logs);
+				returnResponse(response,200,content,'txt',logs);
 			});
 		} else { //トップ以外は静的ファイルを探す
 			var filePath = staticDir + 'default' + request.url;
@@ -89,33 +92,23 @@ function nsweb(request, response) {
 				if (err) { //ファイル無し
 					ns.content(request.url.slice(1),'txt',function(err,content){
 						if (content != null){
-							response.writeHead(200, {'Content-Type': contentType['txt']});
-							response.end(content);
-							accessLog(logs);
+							returnResponse(response,200,content,'txt',logs);
 						} else {
 							//静的ファイルもコンテントも無い場合404
-							var statusCode = 404;
-							logs.statusCode = statusCode;
-							response.writeHead(statusCode, {'Content-Type': contentType['txt']});
-							response.end(statusCode + ' ' + httpStatus[statusCode]);
-							accessLog(logs);
+							logs.statusCode = 404;
+							returnResponse(response,404,'404 ' + httpStatus[404],'txt',logs);
 						}
 					});
 				} else { //ファイルあり
 					var extname  = path.extname(request.url).replace(".", '');
-					response.writeHead(200, {"Content-Type": contentType[extname]});
-					response.end(buf);
-					accessLog(logs);
+					returnResponse(response,200,buf,extname,logs);
 				}
 			});
 		}
 
 	} else { //非許可HTTPメソッドは403
-		var statusCode = 403;
-		logs.statusCode = statusCode;
-		response.writeHead(statusCode, {'Content-Type': 'text/plain;charset=UTF-8'});
-		response.end(statusCode + httpStatus[statusCode]);
-		accessLog(logs);
+		logs.statusCode = 403;
+		returnResponse(response,403,'403 ' + httpStatus[403],'txt',logs);
 	}
 
 
