@@ -7,9 +7,6 @@
  * node以外での利用は考慮しない
  */
 
-//TODO 静的ファイルから取得するのか動的に生成するのかはns本体側でやる
-
-
 /**
  * 設定
  */
@@ -46,7 +43,6 @@ var contentType = {
  */
 
 //nodeコアモジュール
-var fs   = require('fs');
 var path = require('path');
 var http = require('http');
 
@@ -85,23 +81,22 @@ function nsweb(request, response) {
 			ns.timeline('/','txt',function(err,content){
 				returnResponse(response,200,content,'txt',logs);
 			});
-		} else { //トップ以外は静的ファイルを探す
-			var filePath = staticDir + 'default' + request.url;
-			logs.msg += ' readFile:' + filePath;
-			fs.readFile(filePath, function (err, buf) {
-				if (err) { //ファイル無し
-					ns.content(request.url.slice(1),'txt',function(err,content){
-						if (content != null){
-							returnResponse(response,200,content,'txt',logs);
-						} else {
-							//静的ファイルもコンテントも無い場合404
-							logs.statusCode = 404;
-							returnResponse(response,404,'404 ' + httpStatus[404],'txt',logs);
-						}
-					});
-				} else { //ファイルあり
-					var extname  = path.extname(request.url).replace(".", '');
-					returnResponse(response,200,buf,extname,logs);
+		} else { //トップ以外
+			//FIXME 拡張子関連
+			ns.content(request.url,'txt',function(err,content,filePath){
+				if (content != null){
+					var extname = path.extname(request.url).replace(".", '');
+					if(extname == ''){
+						extname = 'txt';
+					}
+					if (filePath) {
+						logs.msg += ' readFile:' + filePath;
+					}
+					returnResponse(response,200,content,extname,logs);
+				} else {
+					//コンテントがない場合404
+					logs.statusCode = 404;
+					returnResponse(response,404,'404 ' + httpStatus[404],'txt',logs);
 				}
 			});
 		}

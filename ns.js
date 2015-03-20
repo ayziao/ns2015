@@ -11,11 +11,15 @@
  */
 var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
+var staticDir = config.staticDir || './static/';
 
 
 /**
  * モジュール
  */
+//nodeコアモジュール
+var fs   = require('fs');
+
 //npm : Node Package Manager
 var sqlite3 = require('sqlite3').verbose();
 
@@ -46,17 +50,25 @@ function timeline(str,type,callback){
 
 //コンテント取得
 function content(str,type,callback){
-	db.serialize(function(){
-		var user = 'test';
-		var sql = "SELECT * FROM basedata WHERE identifier = '"+ str +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";
-		db.all(sql, function(err, rows){
-			if (!err) {
-				callback(null,JSON.stringify(rows[0],null,"\t"));
-			} else {
-				callback(err,null);
-			}
-		}); 
+	var filePath = staticDir + 'default' + str;
+	fs.readFile(filePath, function (err, buf) {
+		if (err) { //静的ファイル無し
+			db.serialize(function(){
+				var user = 'test';
+				var sql = "SELECT * FROM basedata WHERE identifier = '"+ str.slice(1) +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";
+				db.all(sql, function(err, rows){
+					if (!err) {
+						callback(null,JSON.stringify(rows[0],null,"\t"));
+					} else {
+						callback(err,null);
+					}
+				}); 
+			});
+		} else { //ファイルあり
+			callback(null,buf,filePath);
+		}
 	});
+
 }
 
 //TODO 投稿
