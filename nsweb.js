@@ -51,8 +51,8 @@ var http = require('http');
 //自作モジュール
 var ns = require('./ns');
 
-function returnResponse(response,statusCode,content,contentType,logs){
-	response.writeHead(statusCode, {'Content-Type': contentType[contentType]});
+function returnResponse(response,statusCode,content,type,logs){
+	response.writeHead(statusCode, {'Content-Type': contentType[type]});
 	response.end(content);
 	accessLog(logs);
 }
@@ -74,8 +74,8 @@ function nsweb(request, response) {
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
 			//タイムライン //TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
-			ns.timeline('/','txt',function(err,content){
-				returnResponse(response,200,content,'txt',logs);
+			ns.timeline('/','html',function(err,content){
+				returnResponse(response,200,content,'html',logs);
 			});
 		} else { //トップ以外
 			//FIXME 拡張子関連
