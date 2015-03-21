@@ -29,8 +29,112 @@ db.on("trace", function(sql) {
 
 
 /**
+ * 定数的なの
+ */
+var URL_BASE = '/';
+
+//投稿画面HTML
+var tophtml = (function () {/*
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width">
+		<title>投稿フォーム__user__</title>
+		<script type="text/javascript">
+			var key = "none";
+			var sbmit = false;
+			
+			function mojilen(str){
+				document.getElementById('msg1').innerHTML="<span style='font-weight: bold;color:blue ;'>"+str.length+"</span>文字 " + key;
+			}
+			
+		</script>
+	</head>
+	
+	
+	<body>
+		<h1>__user__</h1>
+		<form action="__urlbase__" method="POST" enctype="multipart/form-data">
+			<textarea id="box" style="width:100%;" rows="4" name="t" onKeyup="mojilen(value);"></textarea>
+			tag<input type="text" name="tags">
+			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
+			<input type="file" name="file">
+			<input type="hidden" name="user" value="__user__">
+			<span id="msg1">文字数</span><br>
+		</form>	
+		
+		
+		<script type="text/javascript">
+			
+			var textbox=document.getElementById('box');
+			var submitButton=document.getElementById('btn');
+			
+			textbox.addEventListener('keydown',
+				function(e){
+					key = e.which;
+					if(sbmit==false&&e.metaKey&&e.which==13) {
+						submitButton.click();
+						sbmit = true;
+					}
+				}
+				
+			,false)
+		</script>
+
+		__timeline__
+		
+	</body>
+	
+	</html>
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
+
+
+/**
  * 関数定義
  */
+
+ /**
+ * 日付をフォーマットする
+ * @param  {Date}   date     日付
+ * @param  {String} [format] フォーマット
+ * @return {String}          フォーマット済み日付
+ */
+var formatDate = function (date, format) {
+	if (!format) format = 'YYYY-MM-DD hh:mm:ss.SSS';
+	format = format.replace(/YYYY/g, date.getFullYear());
+	format = format.replace(/MM/g, ('0' + (date.getMonth() + 1)).slice(-2));
+	format = format.replace(/DD/g, ('0' + date.getDate()).slice(-2));
+	format = format.replace(/hh/g, ('0' + date.getHours()).slice(-2));
+	format = format.replace(/mm/g, ('0' + date.getMinutes()).slice(-2));
+	format = format.replace(/ss/g, ('0' + date.getSeconds()).slice(-2));
+	if (format.match(/S/g)) {
+		var milliSeconds = ('00' + date.getMilliseconds()).slice(-3);
+		var length = format.match(/S/g).length;
+		for (var i = 0; i < length; i++) format = format.replace(/S/, milliSeconds.substring(i, i + 1));
+	}
+	return format;
+};
+
+function timelinekumitate(rows){
+	var timeline = '<div>';
+	var day = '';
+	var gyou = 'guusuu';
+	rows.forEach(function(row){
+		if(gyou == 'guusuu'){
+			gyou = 'kisuu';
+		} else {
+			gyou = 'guusuu';
+		}
+		if(day != formatDate(new Date(row.datetime),'YYYY-MM-DD')){
+			day = formatDate(new Date(row.datetime),'YYYY-MM-DD');
+			timeline = timeline + '<h5>' + day + '</h5>' ;
+		}
+
+		timeline = timeline + '<div class="'+ gyou +'"><span class="time">' + formatDate(new Date(row.datetime),'hh:mm:ss') + '</span> ' + row.body + ' ' + row.tags.replace( "twitter_posted" , "" ) + "</div>\n";
+	});
+	return timeline + '</div>';;
+}
 
 //timeline	
 function timeline(str,type,callback){
@@ -39,7 +143,10 @@ function timeline(str,type,callback){
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 10";
 		db.all(sql, function(err, rows){
 			if (!err) {
-				callback(null,JSON.stringify(rows,null,"\t"));
+				var outhtml = tophtml.split("__user__").join(user).split("__urlbase__").join(URL_BASE);
+				var timeline = timelinekumitate(rows);
+				callback(null,outhtml.split("__timeline__").join(timeline));
+				//callback(null,JSON.stringify(rows,null,"\t"));
 			} else {
 				callback(err,null);
 			}
