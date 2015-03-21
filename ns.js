@@ -13,7 +13,6 @@ var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
 var staticDir = config.staticDir || './static/';
 
-
 /**
  * モジュール
  */
@@ -50,9 +49,13 @@ function timeline(str,type,callback){
 
 //コンテント取得
 function content(str,type,callback){
+	//TODO サイトIDどうするか
+	//TODO コマンドテーブルチェック
+	//静的ファイルチェック
 	var filePath = staticDir + 'default' + str;
 	fs.readFile(filePath, function (err, buf) {
 		if (err) { //静的ファイル無し
+			//データテーブルチェック
 			db.serialize(function(){
 				var user = 'test';
 				var sql = "SELECT * FROM basedata WHERE identifier = '"+ str.slice(1) +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";

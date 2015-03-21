@@ -71,10 +71,6 @@ function nsweb(request, response) {
 		statusCode  : 200
 	}
 
-	//TODO コマンドテーブルチェック
-	//TODO 静的ファイルチェック
-	//TODO データテーブルチェック
-
 	if (request.method == 'GET') {
 		if (request.url == '/') { //トップへのアクセス
 			//タイムライン //TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
@@ -107,7 +103,7 @@ function nsweb(request, response) {
 	}
 
 
-//TODO あとで消す デバッグ用
+	//TODO あとで消す デバッグ用
 	console.log(request.headers);
 	console.log('httpVersion : %s',request.httpVersion);
 	console.log('url : %s',request.url);
