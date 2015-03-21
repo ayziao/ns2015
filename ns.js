@@ -87,7 +87,7 @@ var tophtml = (function () {/*
 	</body>
 	
 	</html>
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1];
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
 
 
 /**
