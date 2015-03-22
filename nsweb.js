@@ -14,14 +14,20 @@
 var config    = require('./config.json').ns;
 var staticDir = config.staticDir || './static/';
 
-
 /**
  * 定数的なの
  */
+var URL_BASE = '/';
+
 var httpStatus = {
 	200 : ' OK',
-	403 : ' Forbidden',
-	404 : ' NotFound',
+	303 : ' See Other',             //他を参照せよ
+	304 : ' Not Modified',          //未更新
+	403 : ' Forbidden',             //禁止
+	404 : ' NotFound',              //未検出
+	405 : ' Method Not Allowed',    //許可されていないメソッド
+	500 : ' Internal Server Error', //サーバ内部エラー
+	503 : ' Service Unavailable',   //サービス利用不可
 }
 var contentType = {
 	html : 'text/html;charset=UTF-8' ,
@@ -47,6 +53,7 @@ var path = require('path');
 var http = require('http');
 
 //npm : Node Package Manager
+var formidable = require('formidable');
 
 //自作モジュール
 var ns = require('./ns');
@@ -54,21 +61,36 @@ var ns = require('./ns');
 function returnResponse(response,statusCode,content,type,logs){
 	response.writeHead(statusCode, {'Content-Type': contentType[type]});
 	response.end(content);
+
+	logs.statusCode = statusCode;
 	accessLog(logs);
 }
+
+function redirect(response,statusCode,url,logs){
+	response.writeHead(statusCode, {"location": URL_BASE + url});
+	response.end();
+
+	logs.statusCode = statusCode;
+	accessLog(logs);
+}
+
 
 /**
  * ニアスケイプwebモジュール本体
  */
 function nsweb(request, response) {
 
+	var requestTime = new Date();
+
 	var logs = {
-		requestTime : new Date() ,
+		requestTime : requestTime ,
 		host        : request.headers.host ,
 		url         : request.url ,
+		httpVersion : request.httpVersion ,
+		method      : request.method ,
+		statusCode  : 500 ,
 		userAgent   : request.headers['user-agent'] ,
 		msg         : '' ,
-		statusCode  : 200
 	}
 
 	if (request.method == 'GET') {
@@ -91,26 +113,47 @@ function nsweb(request, response) {
 					returnResponse(response,200,content,extname,logs);
 				} else {
 					//コンテントがない場合404
-					logs.statusCode = 404;
-					returnResponse(response,404,'404 ' + httpStatus[404],'txt',logs);
+					returnResponse(response,404,'404' + httpStatus[404],'txt',logs);
 				}
 			});
 		}
+	} else if (request.method == 'POST') { 
+		var form = new formidable.IncomingForm();
+		var user = 'test'; //FIXME ユーザー取得
 
-	} else { //非許可HTTPメソッドは403
-		logs.statusCode = 403;
-		returnResponse(response,403,'403 ' + httpStatus[403],'txt',logs);
+		form.parse(request, function( err, fields, files) {
+			if(typeof fields.t != "undefined" && fields.t.trim() !== "" ){
+				var body = fields.t.trim();
+				var tags = fields.tags.trim().split(" ");
+				ns.post(body,tags,'test',function(err){
+					if (err){
+						returnResponse(response,500,'err','txt',logs);
+						errorLog({msg:'投稿失敗',err:err});
+					} else {
+						returnResponse(response,200,'posted','txt',logs);
+					}
+				});
+			} else { //本文無しは転送
+				redirect(response,303,'',logs);
+			}
+		});
+	} else { //非許可HTTPメソッドは405
+		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
 	}
 
 
 	//TODO あとで消す デバッグ用
-	console.log(request.headers);
-	console.log('httpVersion : %s',request.httpVersion);
-	console.log('url : %s',request.url);
-	console.log('method : %s',request.method);
-	console.log('idleStart : %s',request.client._idleStart);
-	console.log('monotonicStartTime : %s',request.client._monotonicStartTime);
-
+	// /*
+	console.log({
+		request         : "######################################" ,
+		requestTime : requestTime ,
+		url :request.url ,
+		headers :request.headers ,
+		http : 'v' + request.httpVersion + ' ' + request.method ,
+		idleStart : Date(request.client._idleStart) ,
+		monotonicStartTime :request.client._monotonicStartTime ,
+	});
+	// */
 	//console.log(request);
 }
 
@@ -120,7 +163,8 @@ function nsweb(request, response) {
  */
 function accessLog(logs){
 	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
+	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.httpVersion + ' ' + logs.method + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
+	console.log(logs.statusCode + httpStatus[logs.statusCode]);
 }
 
 function errorLog(log){

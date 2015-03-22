@@ -31,9 +31,9 @@ db.on("trace", function(sql) {
 /**
  * 定数的なの
  */
-var URL_BASE = '/';
+var URL_BASE = '/'; //PENDING webとかコンソールとかから受け取る？
 
-//投稿画面HTML
+//投稿画面HTML //PENDING webで動かしてる時しか投稿フォームとか表示しない？	
 var tophtml = (function () {/*
 <!DOCTYPE html>
 <html>
@@ -136,6 +136,13 @@ function timelinekumitate(rows){
 	return timeline + '</div>';;
 }
 
+function date2identifier(date){
+	var tmpdate = date === undefined ? new Date() : date;
+	var time = process.hrtime();
+	var microtime = ("00000000"+time[1]).slice(-9,-3);
+	return formatDate(tmpdate,'YYYYMMDDhhmmss' + microtime);
+}
+
 //timeline	
 function timeline(str,type,callback){
 	db.serialize(function(){
@@ -178,16 +185,46 @@ function content(str,type,callback){
 			callback(null,buf,filePath);
 		}
 	});
-
 }
 
-//TODO 投稿
+//投稿
+function post(body,tags,user,callback){
+	db.serialize(function(){
+		var date = new Date();
+		var identifier = date2identifier(date) ;
 
+		var tagstring = '';
+		if(tags.lengs > 0){
+			tagstring = ' #' + tags.join(" #")
+		}
+
+		//TODO 画像投稿
+
+		db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
+			[ user ,
+			 identifier ,
+			 formatDate(date,'YYYY-MM-DD hh:mm:ss') ,
+			 identifier ,
+			 tagstring + ' twitter_posted ',
+			 body
+			] ,
+			function(err) {
+				if(err){
+					callback(err);
+				} else {
+					callback(null);
+				}
+			}
+		);
+	});
+	//TODO マルチポスト
+}
 
 /**
  * エクスポート
  */
 module.exports = {
 	timeline : timeline ,
-	content  : content
+	content  : content ,
+	post : post ,
 }
