@@ -8,12 +8,14 @@
 //PENDING 初期化処理 設定ファイル無いとき作る？
 //PENDING 初期化処理 DB無いとき作る？
 
+
 /**
  * 設定
  */
 var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
 var staticDir = config.staticDir || './static/';
+
 
 /**
  * モジュール
@@ -24,16 +26,13 @@ var fs   = require('fs');
 //npm : Node Package Manager
 var sqlite3 = require('sqlite3').verbose();
 
-var db = new sqlite3.Database(dbf);
-db.on("trace", function(sql) {
-  console.log(sql);
-});
+//自作モジュール
+var mp = require('./mp');
 
 
 /**
  * 定数的なの
  */
-var URL_BASE = '/'; //PENDING webとかコンソールとかから受け取る？
 
 //投稿画面HTML //PENDING webで動かしてる時しか投稿フォームとか表示しない？	
 var tophtml = (function () {/*
@@ -42,54 +41,33 @@ var tophtml = (function () {/*
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
-		<title>投稿フォーム__user__</title>
-		<script type="text/javascript">
-			var key = "none";
-			var sbmit = false;
-			
-			function mojilen(str){
-				document.getElementById('msg1').innerHTML="<span style='font-weight: bold;color:blue ;'>"+str.length+"</span>文字 " + key;
-			}
-			
-		</script>
+		<title>タイムライン __user__</title>
 	</head>
 	
 	
 	<body>
 		<h1>__user__</h1>
-		<form action="__urlbase__" method="POST" enctype="multipart/form-data">
-			<textarea id="box" style="width:100%;" rows="4" name="t" onKeyup="mojilen(value);"></textarea>
-			tag<input type="text" name="tags">
-			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
-			<input type="file" name="file">
-			<input type="hidden" name="user" value="__user__">
-			<span id="msg1">文字数</span><br>
-		</form>	
-		
-		
-		<script type="text/javascript">
-			
-			var textbox=document.getElementById('box');
-			var submitButton=document.getElementById('btn');
-			
-			textbox.addEventListener('keydown',
-				function(e){
-					key = e.which;
-					if(sbmit==false&&e.metaKey&&e.which==13) {
-						submitButton.click();
-						sbmit = true;
-					}
-				}
-				
-			,false)
-		</script>
 
+		__form__
+		
 		__timeline__
 		
 	</body>
 	
 	</html>
 */}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
+
+
+
+/**
+ * 初期化
+ */
+//DB
+var db = new sqlite3.Database(dbf);
+db.on("trace", function(sql) {
+  console.log(sql);
+});
+
 
 
 /**
@@ -152,9 +130,9 @@ function timeline(str,type,callback){
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 10";
 		db.all(sql, function(err, rows){
 			if (!err) {
-				var outhtml = tophtml.split("__user__").join(user).split("__urlbase__").join(URL_BASE);
 				var timeline = timelinekumitate(rows);
-				callback(null,outhtml.split("__timeline__").join(timeline));
+				var rtnhtml = tophtml.split("__user__").join(user).split("__timeline__").join(timeline);
+				callback(null,rtnhtml);
 				//callback(null,JSON.stringify(rows,null,"\t"));
 			} else {
 				callback(err,null);
@@ -191,14 +169,15 @@ function content(str,type,callback){
 
 //投稿
 function post(body,tags,user,callback){
-	db.serialize(function(){
-		var date = new Date();
-		var identifier = date2identifier(date) ;
+	var date = new Date();
+	var identifier = date2identifier(date) ;
 
-		var tagstring = '';
-		if(tags.lengs > 0){
-			tagstring = ' #' + tags.join(" #")
-		}
+	var tagstring = '';
+	if(tags.length > 0 && tags[0] != ''){
+		tagstring = ' #' + tags.join(" #")
+	}
+
+	db.serialize(function(){
 
 		//TODO 画像投稿
 
@@ -207,7 +186,7 @@ function post(body,tags,user,callback){
 			 identifier ,
 			 formatDate(date,'YYYY-MM-DD hh:mm:ss') ,
 			 identifier ,
-			 tagstring + ' twitter_posted ',
+			 tagstring , // + ' twitter_posted ',
 			 body
 			] ,
 			function(err) {
@@ -219,7 +198,9 @@ function post(body,tags,user,callback){
 			}
 		);
 	});
-	//TODO マルチポスト
+	
+	//マルチポスト
+	mp.post(body,tags,user,function(){});
 }
 
 /**

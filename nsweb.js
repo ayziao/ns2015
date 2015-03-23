@@ -43,6 +43,56 @@ var contentType = {
 	txt  : 'text/plain;charset=UTF-8' ,
 };
 
+var formHtml = (function () {/*
+		<form action="__urlbase__" method="POST" enctype="multipart/form-data">
+
+			<script type="text/javascript">
+				var textbox=document.getElementById('box');
+				var submitButton=document.getElementById('btn');
+				
+				textbox.addEventListener(
+					'keydown',
+					function(e){
+						key = e.which;
+						if(sbmit==false&&e.metaKey&&e.which==13) {
+							submitButton.click();
+							sbmit = true;
+						}
+					},
+					false
+				)
+
+				var key = "none";
+				var sbmit = false;
+
+				var bodylen = 0;
+				var taglen = 0;
+
+				function showmojilen(){
+					var strlen = bodylen + taglen;
+					document.getElementById('strcount').innerHTML="<span style='font-weight: bold;color:blue ;'>"+strlen+"</span>文字 " + key;
+				}
+				
+				function mojilenbody(str){
+					bodylen = str.length;
+				}
+
+				function mojilentag(str){
+					taglen = str.length;
+				}
+				
+			</script>
+
+			<textarea id="box" style="width:100%;" rows="4" name="body" onKeyup="mojilenbody(value);"></textarea>
+			tag<input type="text" name="tags" onKeyup="mojilentag(value);">
+			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
+			<input type="file" name="file">
+			<input type="hidden" name="user" value="__user__">
+			<span id="strcount">文字数</span><br>
+
+		</form>	
+*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
+
 
 /**
  * モジュール
@@ -58,6 +108,43 @@ var formidable = require('formidable');
 //自作モジュール
 var ns = require('./ns');
 
+
+/**
+ * モジュールローカル関数
+ */
+
+function httpGet(request, response,logs){
+	if (request.url == '/') { //トップへのアクセス
+		//タイムライン 
+		ns.timeline('/','html',function(err,content){
+			//TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
+			//PENDING 権限を持ったユーザがアクセスした時にHTMLには機能を付与して表示する その方法を考える
+
+			//FIXME 投稿フォーム埋め込み
+			var reshtml = content.split("__form__").join(formHtml).split("__urlbase__").join(URL_BASE);
+			returnResponse(response,200,reshtml,'html',logs);
+		});
+	} else { //トップ以外
+		//FIXME 拡張子関連
+		ns.content(request.url,'txt',function(err,content,filePath){
+			if (content != null){
+				var extname = path.extname(request.url).replace(".", '');
+				if(extname == ''){
+					extname = 'txt';
+				}
+				if (filePath) {
+					logs.msg += ' readFile:' + filePath;
+				}
+				returnResponse(response,200,content,extname,logs);
+			} else {
+				//コンテントがない場合404
+				returnResponse(response,404,'404' + httpStatus[404],'txt',logs);
+			}
+		});
+	}
+}
+
+
 function returnResponse(response,statusCode,content,type,logs){
 	response.writeHead(statusCode, {'Content-Type': contentType[type]});
 	response.end(content);
@@ -65,6 +152,7 @@ function returnResponse(response,statusCode,content,type,logs){
 	logs.statusCode = statusCode;
 	accessLog(logs);
 }
+
 
 function redirect(response,statusCode,url,logs){
 	response.writeHead(statusCode, {"location": URL_BASE + url});
@@ -75,8 +163,26 @@ function redirect(response,statusCode,url,logs){
 }
 
 
-/**
- * ニアスケイプwebモジュール本体
+function accessLog(logs){
+	//TODO apache形式でファイルに書き出したりできるように	
+	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.httpVersion + ' ' + logs.method + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
+	console.log(logs.statusCode + httpStatus[logs.statusCode]);
+}
+
+
+function errorLog(log){
+	//TODO オブジェクト受け取るようにする
+	//TODO apache形式でファイルに書き出したりできるように	
+	console.log(log);
+}
+
+
+/** ニアスケイプwebモジュール本体
+ * 
+ * node httpモジュールから呼ばれる	
+ * リクエストメソッドによって処理を振り分ける
+ * 
+ * //PENDING 先にURLで振り分けるべき？
  */
 function nsweb(request, response) {
 
@@ -94,37 +200,15 @@ function nsweb(request, response) {
 	}
 
 	if (request.method == 'GET') {
-		if (request.url == '/') { //トップへのアクセス
-			//タイムライン //TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
-			ns.timeline('/','html',function(err,content){
-				returnResponse(response,200,content,'html',logs);
-			});
-		} else { //トップ以外
-			//FIXME 拡張子関連
-			ns.content(request.url,'txt',function(err,content,filePath){
-				if (content != null){
-					var extname = path.extname(request.url).replace(".", '');
-					if(extname == ''){
-						extname = 'txt';
-					}
-					if (filePath) {
-						logs.msg += ' readFile:' + filePath;
-					}
-					returnResponse(response,200,content,extname,logs);
-				} else {
-					//コンテントがない場合404
-					returnResponse(response,404,'404' + httpStatus[404],'txt',logs);
-				}
-			});
-		}
+		httpGet(request, response,logs);
 	} else if (request.method == 'POST') { 
 		var form = new formidable.IncomingForm();
 		var user = 'test'; //FIXME ユーザー取得
 
 		form.parse(request, function( err, fields, files) {
-			if(typeof fields.t != "undefined" && fields.t.trim() !== "" ){
-				var body = fields.t.trim();
-				var tags = fields.tags.trim().split(" ");
+			if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
+				var body = fields.body.trim();
+				var tags = fields.tags.trim().split(" ").filter(Boolean);
 				ns.post(body,tags,'test',function(err){
 					if (err){
 						returnResponse(response,500,'err','txt',logs);
@@ -141,7 +225,6 @@ function nsweb(request, response) {
 		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
 	}
 
-
 	//TODO あとで消す デバッグ用
 	// /*
 	console.log({
@@ -156,23 +239,6 @@ function nsweb(request, response) {
 	// */
 	//console.log(request);
 }
-
-
-/**
- * モジュール内関数
- */
-function accessLog(logs){
-	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.httpVersion + ' ' + logs.method + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
-	console.log(logs.statusCode + httpStatus[logs.statusCode]);
-}
-
-function errorLog(log){
-	//TODO オブジェクト受け取るようにする
-	//TODO apache形式でファイルに書き出したりできるように	
-	console.log(log);
-}
-
 
 /**
  * エクスポート
