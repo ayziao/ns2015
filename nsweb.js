@@ -80,7 +80,6 @@ var formHtml = (function () {/*
 				function mojilentag(str){
 					taglen = str.length;
 				}
-				
 			</script>
 
 			<textarea id="box" style="width:100%;" rows="4" name="body" onKeyup="mojilenbody(value);"></textarea>
@@ -112,7 +111,7 @@ var ns = require('./ns');
 /**
  * モジュールローカル関数
  */
-
+//GETリクエスト
 function httpGet(request, response,logs){
 	if (request.url == '/') { //トップへのアクセス
 		//タイムライン 
@@ -144,7 +143,31 @@ function httpGet(request, response,logs){
 	}
 }
 
+//POSTリクエスト
+function httpPost(request, response,logs){
+	var form = new formidable.IncomingForm();
+	var user = 'test'; //FIXME ユーザー取得
+	//TODO 権限チェック
 
+	form.parse(request, function( err, fields, files) {
+		if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
+			var body = fields.body.trim();
+			var tags = fields.tags.trim().split(" ").filter(Boolean);
+			ns.post(body,tags,'test',function(err){
+				if (err){
+					returnResponse(response,500,'err','txt',logs);
+					errorLog({msg:'投稿失敗',err:err});
+				} else {
+					returnResponse(response,200,'posted','txt',logs);
+				}
+			});
+		} else { //本文無しは転送
+			redirect(response,303,'',logs);
+		}
+	});
+}
+
+//返送
 function returnResponse(response,statusCode,content,type,logs){
 	response.writeHead(statusCode, {'Content-Type': contentType[type]});
 	response.end(content);
@@ -153,7 +176,7 @@ function returnResponse(response,statusCode,content,type,logs){
 	accessLog(logs);
 }
 
-
+//転送
 function redirect(response,statusCode,url,logs){
 	response.writeHead(statusCode, {"location": URL_BASE + url});
 	response.end();
@@ -162,14 +185,14 @@ function redirect(response,statusCode,url,logs){
 	accessLog(logs);
 }
 
-
+//アクセスログ
 function accessLog(logs){
 	//TODO apache形式でファイルに書き出したりできるように	
 	console.log(logs.requestTime + ' ' + logs.host + ' ' + logs.httpVersion + ' ' + logs.method + ' ' + logs.url + ' ' + logs.statusCode + httpStatus[logs.statusCode] + ' ' + logs.userAgent + logs.msg);
 	console.log(logs.statusCode + httpStatus[logs.statusCode]);
 }
 
-
+//エラーログ
 function errorLog(log){
 	//TODO オブジェクト受け取るようにする
 	//TODO apache形式でファイルに書き出したりできるように	
@@ -181,8 +204,6 @@ function errorLog(log){
  * 
  * node httpモジュールから呼ばれる	
  * リクエストメソッドによって処理を振り分ける
- * 
- * //PENDING 先にURLで振り分けるべき？
  */
 function nsweb(request, response) {
 
@@ -199,28 +220,11 @@ function nsweb(request, response) {
 		msg         : '' ,
 	}
 
+ 	//PENDING 先にURLで振り分けるべき？
 	if (request.method == 'GET') {
 		httpGet(request, response,logs);
 	} else if (request.method == 'POST') { 
-		var form = new formidable.IncomingForm();
-		var user = 'test'; //FIXME ユーザー取得
-
-		form.parse(request, function( err, fields, files) {
-			if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
-				var body = fields.body.trim();
-				var tags = fields.tags.trim().split(" ").filter(Boolean);
-				ns.post(body,tags,'test',function(err){
-					if (err){
-						returnResponse(response,500,'err','txt',logs);
-						errorLog({msg:'投稿失敗',err:err});
-					} else {
-						returnResponse(response,200,'posted','txt',logs);
-					}
-				});
-			} else { //本文無しは転送
-				redirect(response,303,'',logs);
-			}
-		});
+		httpPost(request, response,logs);
 	} else { //非許可HTTPメソッドは405
 		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
 	}
@@ -228,13 +232,13 @@ function nsweb(request, response) {
 	//TODO あとで消す デバッグ用
 	// /*
 	console.log({
-		request         : "######################################" ,
-		requestTime : requestTime ,
-		url :request.url ,
-		headers :request.headers ,
-		http : 'v' + request.httpVersion + ' ' + request.method ,
-		idleStart : Date(request.client._idleStart) ,
-		monotonicStartTime :request.client._monotonicStartTime ,
+		request            : "######################################" ,
+		requestTime        : requestTime ,
+		url                : request.url ,
+		headers            : request.headers ,
+		http               : 'v' + request.httpVersion + ' ' + request.method ,
+		idleStart          : Date(request.client._idleStart) ,
+		monotonicStartTime : request.client._monotonicStartTime ,
 	});
 	// */
 	//console.log(request);

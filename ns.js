@@ -44,19 +44,14 @@ var tophtml = (function () {/*
 		<title>タイムライン __user__</title>
 	</head>
 	
-	
 	<body>
 		<h1>__user__</h1>
 
 		__form__
-		
 		__timeline__
-		
 	</body>
-	
-	</html>
+</html>
 */}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
-
 
 
 /**
@@ -69,12 +64,11 @@ db.on("trace", function(sql) {
 });
 
 
-
 /**
- * 関数定義
+ * モジュールローカル関数
  */
 
- /**
+/**
  * 日付をフォーマットする
  * @param  {Date}   date     日付
  * @param  {String} [format] フォーマット
@@ -96,10 +90,13 @@ var formatDate = function (date, format) {
 	return format;
 };
 
+//タイムライン組み立て
 function timelinekumitate(rows){
+	//PENDING 名前どうにか		
 	var timeline = '<div>';
 	var day = '';
 	var gyou = 'guusuu';
+
 	rows.forEach(function(row){
 		if(gyou == 'guusuu'){
 			gyou = 'kisuu';
@@ -122,6 +119,10 @@ function date2identifier(date){
 	var microtime = ("00000000"+time[1]).slice(-9,-3);
 	return formatDate(tmpdate,'YYYYMMDDhhmmss' + microtime);
 }
+
+/**
+ * モジュール公開関数
+ */
 
 //timeline	
 function timeline(str,type,callback){
@@ -202,6 +203,7 @@ function post(body,tags,user,callback){
 	//マルチポスト
 	mp.post(body,tags,user,function(){});
 }
+
 
 /**
  * エクスポート

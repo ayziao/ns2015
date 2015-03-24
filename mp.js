@@ -7,7 +7,7 @@
 /**
  * 設定
  */
-var config    = require('./config.json').twitter;
+var config = require('./config.json').twitter;
 
 
 /**
@@ -34,7 +34,7 @@ function post(body,tags,user,callback){
 		include_entities: 1
 	};
 
-	var twitest = new twitter(config.test);
+	var twitest = new twitter(config[user]);
 	twitest.post('/statuses/update.json', params, function (err,res) {
 		if (err) {
 			//DEBUG あとで消す
@@ -49,7 +49,6 @@ function post(body,tags,user,callback){
 			});
 		}
 	});
-
 }
 
 /**
