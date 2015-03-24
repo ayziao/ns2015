@@ -151,8 +151,8 @@ function httpPost(request, response,logs){
 
 	form.parse(request, function( err, fields, files) {
 		if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
-			var body = fields.body.trim();
-			var tags = fields.tags.trim().split(" ").filter(Boolean);
+			var body = fields.body.replace(/\r\n?/g,"\n").trim();
+			var tags = fields.tags.trim().replace(/\s/, " ").replace(/\s{2,}/, " ").split(" ").filter(Boolean);
 			ns.post(body,tags,'test',function(err){
 				if (err){
 					returnResponse(response,500,'err','txt',logs);
