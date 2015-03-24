@@ -42,6 +42,7 @@ var tophtml = (function () {/*
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
 		<title>タイムライン __user__</title>
+        <link rel="stylesheet" type="text/css" href="./css.css" />
 	</head>
 	
 	<body>
@@ -92,7 +93,8 @@ var formatDate = function (date, format) {
 
 //タイムライン組み立て
 function timelinekumitate(rows){
-	//PENDING 名前どうにか		
+	//PENDING 名前どうにか	
+	//PENDING SQLの戻り行達から直で組み立てるのではなく日付とかでツリー構造のオブジェクトにする？
 	var timeline = '<div>';
 	var day = '';
 	var gyou = 'guusuu';
@@ -108,7 +110,13 @@ function timelinekumitate(rows){
 			timeline = timeline + '<h5>' + day + '</h5>' ;
 		}
 
-		timeline = timeline + '<div class="'+ gyou +'"><span class="time">' + formatDate(new Date(row.datetime),'hh:mm:ss') + '</span> ' + row.body + ' ' + row.tags.replace( "twitter_posted" , "" ) + "</div>\n";
+		//PENDING 改行した時時刻がアレ	
+		timeline += '<div class="'+ gyou +'">' 
+			+ '<span class="time">' + '<a href="' + './' + row.identifier + '">' 
+			+ formatDate(new Date(row.datetime),'hh:mm:ss') 
+			+ '</a></span> ' 
+			+ row.body.replace(/\n/g,"\n<br/>") + ' ' + row.tags.replace( "twitter_posted" , "" ) 
+			+ "</div>\n";
 	});
 	return timeline + '</div>';;
 }
@@ -182,6 +190,7 @@ function post(body,tags,user,callback){
 
 		//TODO 画像投稿
 
+		//PENDING 直近の投稿と同じだったらどうするか ボタン誤連打は表示側で防ぐか？
 		db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
 			[ user ,
 			 identifier ,
