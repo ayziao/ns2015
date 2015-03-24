@@ -37,11 +37,21 @@ function post(body,tags,user,callback){
 	var twitest = new twitter(config[user]);
 	twitest.post('/statuses/update.json', params, function (err,res) {
 		if (err) {
-			//DEBUG あとで消す
-			console.log({tweet_respons:'**********errrrrrrrrrr***************',
-				err:err,
-				res:res,
-			});
+			//PENDING 重複投稿をどうにか	
+			if (err.code = 187){
+				params.status += '.'
+				twitest.post('/statuses/update.json', params, function (err,res) {
+					console.log({tweet_respons:'*************************',
+						res:res,
+					});
+				});
+			} else {
+				//DEBUG あとで消す
+				console.log({tweet_respons:'**********errrrrrrrrrr***************',
+					err:err,
+					res:res,
+				});			
+			}
 		} else {
 			//DEBUG あとで消す
 			console.log({tweet_respons:'*************************',
