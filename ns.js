@@ -42,7 +42,7 @@ var tophtml = (function () {/*
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
 		<title>タイムライン __user__</title>
-        <link rel="stylesheet" type="text/css" href="./css.css" />
+		<link rel="stylesheet" type="text/css" href="./css.css" />
 	</head>
 	
 	<body>
@@ -135,7 +135,7 @@ function date2identifier(date){
 function timeline(str,type,callback){
 	db.serialize(function(){
 		var user = 'test';
-		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 50";
+		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 100";
 		db.all(sql, function(err, rows){
 			if (!err) {
 				var timeline = timelinekumitate(rows);

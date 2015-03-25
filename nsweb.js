@@ -91,8 +91,7 @@ var formHtml = (function () {/*
 
 		</form>	
 */}).toString().match(/\n([\s\S]*)\n/)[0];
-
-	console.log(formHtml);
+//console.log(formHtml);
 
 
 /**
