@@ -47,7 +47,6 @@ var tophtml = (function () {/*
 	
 	<body>
 		<h1>__user__</h1>
-
 		__form__
 		__timeline__
 	</body>
@@ -95,7 +94,7 @@ var formatDate = function (date, format) {
 function timelinekumitate(rows){
 	//PENDING 名前どうにか	
 	//PENDING SQLの戻り行達から直で組み立てるのではなく日付とかでツリー構造のオブジェクトにする？
-	var timeline = '<div>';
+	var timeline = '\n\t\t<div>';
 	var day = '';
 	var gyou = 'guusuu';
 
@@ -107,18 +106,18 @@ function timelinekumitate(rows){
 		}
 		if(day != formatDate(new Date(row.datetime),'YYYY-MM-DD')){
 			day = formatDate(new Date(row.datetime),'YYYY-MM-DD');
-			timeline = timeline + '<h5>' + day + '</h5>' ;
+			timeline = timeline + '\n\t\t\t<h5>' + day + '</h5>\n' ;
 		}
 
 		//PENDING 改行した時時刻がアレ	
-		timeline += '<div class="'+ gyou +'">' 
+		timeline += '\t\t\t<div class="'+ gyou +'">' 
 			+ '<span class="time">' + '<a href="' + './' + row.identifier + '">' 
 			+ formatDate(new Date(row.datetime),'hh:mm:ss') 
 			+ '</a></span> ' 
-			+ row.body.replace(/\n/g,"\n<br/>") + ' ' + row.tags.replace( "twitter_posted" , "" ) 
+			+ row.body.replace(/\n/g,"<br/>") + ' ' + row.tags.replace( "twitter_posted" , "" ) 
 			+ "</div>\n";
 	});
-	return timeline + '</div>';;
+	return timeline + '\t\t</div>\n';;
 }
 
 function date2identifier(date){
@@ -146,7 +145,7 @@ function timeline(str,type,callback){
 			} else {
 				callback(err,null);
 			}
-		}); 
+		});
 	});
 }
 
@@ -168,7 +167,7 @@ function content(str,type,callback){
 					} else {
 						callback(err,null);
 					}
-				}); 
+				});
 			});
 		} else { //ファイルあり
 			callback(null,buf,filePath);

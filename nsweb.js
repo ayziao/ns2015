@@ -85,12 +85,14 @@ var formHtml = (function () {/*
 			<textarea id="box" style="width:100%;" rows="4" name="body" onKeyup="mojilenbody(value);"></textarea>
 			tag<input type="text" name="tags" onKeyup="mojilentag(value);">
 			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
-			<input type="file" name="file">
+			<input type="file" name="file" accept="image/*">
 			<input type="hidden" name="user" value="__user__">
 			<span id="strcount">文字数</span><br>
 
 		</form>	
-*/}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
+*/}).toString().match(/\n([\s\S]*)\n/)[0];
+
+	console.log(formHtml);
 
 
 /**
@@ -150,6 +152,7 @@ function httpPost(request, response,logs){
 	//TODO 権限チェック
 
 	form.parse(request, function( err, fields, files) {
+		console.log(files);
 		if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
 			var body = fields.body.replace(/\r\n?/g,"\n").trim();
 			var tags = fields.tags.trim().replace(/\s/, " ").replace(/\s{2,}/, " ").split(" ").filter(Boolean);
