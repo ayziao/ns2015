@@ -41,14 +41,14 @@ var tophtml = (function () {/*
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width">
-		<title>タイムライン __user__</title>
+		<title>__title__ __user__</title>
 		<link rel="stylesheet" type="text/css" href="./css.css" />
 	</head>
 	
 	<body>
 		<h1>__user__</h1>
 		__form__
-		__timeline__
+		__contents__
 	</body>
 </html>
 */}).toString().match(/[^]*\/\*([^]*)\*\/\}$/)[1].trim();
@@ -138,10 +138,15 @@ function timeline(str,type,callback){
 		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 100";
 		db.all(sql, function(err, rows){
 			if (!err) {
-				var timeline = timelinekumitate(rows);
-				var rtnhtml = tophtml.split("__user__").join(user).split("__timeline__").join(timeline);
-				callback(null,rtnhtml);
-				//callback(null,JSON.stringify(rows,null,"\t"));
+				if(type == 'html'){
+					var timeline = timelinekumitate(rows);
+					var rtnhtml = tophtml.split("__user__").join(user)
+						.split("__contents__").join(timeline)
+						.split("__title__").join('タイムライン');
+					callback(null,rtnhtml);
+				} else {
+					//callback(null,JSON.stringify(rows,null,"\t"));
+				}
 			} else {
 				callback(err,null);
 			}
