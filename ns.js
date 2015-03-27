@@ -135,7 +135,8 @@ function date2identifier(date){
 function timeline(str,type,callback){
 	db.serialize(function(){
 		var user = 'test';
-		var sql = "SELECT * FROM basedata WHERE user = '"+ user +"' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 100";
+		var sql = "SELECT * FROM basedata WHERE user = '" + user 
+			+ "' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 100";
 		db.all(sql, function(err, rows){
 			if (!err) {
 				if(type == 'html'){
@@ -165,7 +166,9 @@ function content(str,type,callback){
 			//データテーブルチェック
 			db.serialize(function(){
 				var user = 'test';
-				var sql = "SELECT * FROM basedata WHERE identifier = '"+ str.slice(1) +"' AND user = '"+ user +"' ORDER BY identifier DESC LIMIT 1";
+				var sql = "SELECT * FROM basedata WHERE identifier = '"
+					+ str.slice(1) +"' AND user = '"
+					+ user +"' ORDER BY identifier DESC LIMIT 1";
 				db.all(sql, function(err, rows){
 					if (!err) {
 						callback(null,JSON.stringify(rows[0],null,"\t"));
