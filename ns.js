@@ -146,7 +146,7 @@ function timeline(str,type,callback){
 						.split("__title__").join('タイムライン');
 					callback(null,rtnhtml);
 				} else {
-					//callback(null,JSON.stringify(rows,null,"\t"));
+					callback(null,JSON.stringify(rows,null,"\t"));
 				}
 			} else {
 				callback(err,null);

@@ -32,6 +32,8 @@ var httpStatus = {
 var contentType = {
 	html : 'text/html;charset=UTF-8' ,
 	htm  : 'text/html;charset=UTF-8' ,
+	xml  : 'application/xml;charset=UTF-8' ,
+	json : 'application/json; charset=utf-8' ,
 	js   : 'text/javascript;charset=UTF-8' ,
 	css  : 'text/css;charset=UTF-8' ,
 	gif  : 'image/gif' ,
@@ -41,6 +43,8 @@ var contentType = {
 	png  : 'image/png' ,
 	ico  : 'image/vnd.microsoft.icon' ,
 	txt  : 'text/plain;charset=UTF-8' ,
+	csv  : 'text/csv;charset=UTF-8' ,
+	tsv  : 'text/tab-separated-values;charset=UTF-8' ,
 };
 
 var formHtml = (function () {/*
