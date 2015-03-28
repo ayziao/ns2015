@@ -184,7 +184,7 @@ function content(str,type,callback){
 }
 
 //投稿
-function post(body,tags,user,callback){
+function post(body,tags,files,user,callback){
 	var date = new Date();
 	var identifier = date2identifier(date) ;
 
@@ -217,7 +217,7 @@ function post(body,tags,user,callback){
 	});
 	
 	//マルチポスト
-	mp.post(body,tags,user,function(){});
+	mp.post(body,tags,files,user,function(){});
 }
 
 

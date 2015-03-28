@@ -13,6 +13,9 @@ var config = require('./config.json').twitter;
 /**
  * モジュール
  */
+//nodeコアモジュール
+var fs = require('fs');
+
 //npm : Node Package Manager
 var twitter = require('twitter');
 
@@ -22,8 +25,30 @@ var twitter = require('twitter');
  */
 
 //投稿
-function post(body,tags,user,callback){
+function post(body,tags,files,user,callback){
 
+	//TODO サービスごとにどうにか
+	//Twitter
+	var twitest = new twitter(config[user]);
+
+	//PENDING 複数ファイル対応するか
+	for (var key in files) {
+		var value = files[key];
+		if(value.size > 0 && value.name != ''){
+			fs.readFile(value.path, function (err, buf) {
+				twitest.post('/media/upload.json', {media:buf}, function (err,res) {
+					console.log(res);
+					twitterStatusesUpdate(twitest,body,tags,res.media_id_string);
+				});
+			});
+		} else {
+			twitterStatusesUpdate(twitest,body,tags);
+		}
+	};
+}
+
+function twitterStatusesUpdate(twitterObj,body,tags,media_ids){
+	
 	var tagstring = '';
 	if(tags.length > 0){
 		tagstring = ' #' + tags.join(" #")
@@ -31,16 +56,19 @@ function post(body,tags,user,callback){
 
 	var params = {
 		status: body + tagstring,
-		include_entities: 1
+		include_entities: 1,
 	};
 
-	var twitest = new twitter(config[user]);
-	twitest.post('/statuses/update.json', params, function (err,res) {
+	if (media_ids){
+		params['media_ids'] = media_ids;
+	}
+
+	twitterObj.post('/statuses/update.json', params, function (err,res) {
 		if (err) {
 			//PENDING 重複投稿をどうにか	
 			if (err.code = 187){
 				params.status += '.'
-				twitest.post('/statuses/update.json', params, function (err,res) {
+				twitterObj.post('/statuses/update.json', params, function (err,res) {
 					console.log({tweet_respons:'*************************',
 						res:res,
 					});
@@ -50,7 +78,7 @@ function post(body,tags,user,callback){
 				console.log({tweet_respons:'**********errrrrrrrrrr***************',
 					err:err,
 					res:res,
-				});			
+				});
 			}
 		} else {
 			//DEBUG あとで消す
@@ -60,6 +88,7 @@ function post(body,tags,user,callback){
 		}
 	});
 }
+
 
 /**
  * エクスポート

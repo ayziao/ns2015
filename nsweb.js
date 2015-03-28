@@ -159,7 +159,7 @@ function httpPost(request, response,logs){
 		if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
 			var body = fields.body.replace(/\r\n?/g,"\n").trim();
 			var tags = fields.tags.trim().replace(/\s/, " ").replace(/\s{2,}/, " ").split(" ").filter(Boolean);
-			ns.post(body,tags,'test',function(err){
+			ns.post(body,tags,files,'test',function(err){
 				if (err){
 					returnResponse(response,500,'err','txt',logs);
 					errorLog({msg:'投稿失敗',err:err});
