@@ -28,26 +28,32 @@ var twitter = require('twitter');
 function post(body,tags,files,user,callback){
 
 	//TODO サービスごとにどうにか
+
 	//Twitter
-	var twitest = new twitter(config[user]);
+	var twitest = new twitter(config[user]['main']);
+	var aaa = function(){};
+	if (typeof config[user]['sub'] != "undefined") {
+		var twitestsub = new twitter(config[user]['sub']);
+		aaa = function(res){
+			twitterStatusesUpdate(twitestsub,res.text + ' .',[],null,function(){});
+		};
+	}
 
 	//PENDING 複数ファイル対応するか
-	for (var key in files) {
-		var value = files[key];
-		if(value.size > 0 && value.name != ''){
-			fs.readFile(value.path, function (err, buf) {
-				twitest.post('/media/upload.json', {media:buf}, function (err,res) {
-					console.log(res);
-					twitterStatusesUpdate(twitest,body,tags,res.media_id_string);
-				});
+	var value = files['file'];
+	if(value.size > 0 && value.name != ''){
+		fs.readFile(value.path, function (err, buf) {
+			twitest.post('/media/upload.json', {media:buf}, function (err,res) {
+				console.log(res);
+				twitterStatusesUpdate(twitest,body,tags,res.media_id_string,aaa);
 			});
-		} else {
-			twitterStatusesUpdate(twitest,body,tags);
-		}
-	};
+		});
+	} else {
+		twitterStatusesUpdate(twitest,body,tags,null,aaa);
+	}
 }
 
-function twitterStatusesUpdate(twitterObj,body,tags,media_ids){
+function twitterStatusesUpdate(twitterObj,body,tags,media_ids,callback){
 	
 	var tagstring = '';
 	if(tags.length > 0){
@@ -67,11 +73,12 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids){
 		if (err) {
 			//PENDING 重複投稿をどうにか	
 			if (err.code = 187){
-				params.status += '.'
+				params.status += ' .'
 				twitterObj.post('/statuses/update.json', params, function (err,res) {
 					console.log({tweet_respons:'*************************',
 						res:res,
 					});
+					callback(res);
 				});
 			} else {
 				//DEBUG あとで消す
@@ -85,6 +92,7 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids){
 			console.log({tweet_respons:'*************************',
 				res:res,
 			});
+			callback(res);
 		}
 	});
 }
