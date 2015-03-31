@@ -15,6 +15,7 @@
 var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
 var staticDir = config.staticDir || './static/';
+var gyazokey = require('./config.json').gyazo; //fixme DBに
 
 
 /**
@@ -25,6 +26,7 @@ var fs   = require('fs');
 
 //npm : Node Package Manager
 var sqlite3 = require('sqlite3').verbose();
+var Gyazo  = require('gyazo-api');
 
 //自作モジュール
 var mp = require('./mp');
@@ -63,6 +65,7 @@ db.on("trace", function(sql) {
   console.log(sql);
 });
 
+var gyazo_client = new Gyazo(gyazokey);
 
 /**
  * モジュールローカル関数
@@ -117,7 +120,7 @@ function timelinekumitate(rows){
 			+ row.body.replace(/\n/g,"<br/>") + ' ' + row.tags.replace( "twitter_posted" , "" ) 
 			+ "</div>\n";
 	});
-	return timeline + '\t\t</div>\n';;
+	return timeline + '\t\t</div>\n';
 }
 
 function date2identifier(date){
@@ -195,30 +198,94 @@ function post(body,tags,files,user,callback){
 
 	db.serialize(function(){
 
-		//TODO 画像投稿
+		//画像投稿
+		//TODO ローカル環境に画像を保存するようにして gyazoはmpで
+		//TODO twitter_postedはmpで後で付与するように
+		//PENDING mpへの指示はキューを通してやるようにする？
+		var value = files['file'];
+		if(value.size > 0 && value.name != ''){
+			gyazo_client.upload(files.file.path)
+			.then(function(gyazores){
+				//DEBUG あとで消す
+				console.log({
+					gyazo_post:'*************************',
+					files:files,
+					res:gyazores
+				});
 
-		//PENDING 直近の投稿と同じだったらどうするか ボタン誤連打は表示側で防ぐか？
-		db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
-			[ user ,
-			 identifier ,
-			 formatDate(date,'YYYY-MM-DD hh:mm:ss') ,
-			 identifier ,
-			 tagstring , // + ' twitter_posted ',
-			 body
-			] ,
-			function(err) {
-				if(err){
-					callback(err);
-				} else {
-					callback(null);
+				var date1 = new Date();
+				var identifier1 = date2identifier(date1) ;
+
+				db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
+					[ user ,
+					 identifier1 ,
+					 formatDate(date1,'YYYY-MM-DD hh:mm:ss') ,
+					 identifier1 ,
+					 ' gyazo_posted ',
+					 JSON.stringify(gyazores.data)
+					] ,
+					function(err) {
+						if(err){	
+							console.log(err);
+						} else {
+							var date2 = new Date();
+							var identifier2 = date2identifier(date2);
+							var tags2 = tagstring + ' twitter_posted with_image:' + identifier1 + ' ';
+
+							db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
+								[ user ,
+								 identifier2 ,
+								 formatDate(date2,'YYYY-MM-DD hh:mm:ss') ,
+								 identifier2 ,
+								 tags2,
+								 body
+								] ,
+								function(err) {
+									if(err){
+										console.log(err);
+									} else {
+										callback(null);
+
+										//マルチポスト
+										mp.post(body,tags,files,gyazores,user,function(){});
+									}
+								}
+							);
+						}
+					}
+				);
+			})
+			.catch(function(err){
+				//DEBUG あとで消す
+				console.log({err_respons:'######gyazo errrrrrrrrrrrrr#######' ,err:err}); //err.stack
+			});
+		} else {
+			//PENDING 直近の投稿と同じだったらどうするか ボタン誤連打は表示側で防ぐか？
+			db.run("INSERT INTO basedata (user,identifier,datetime,title,tags,body) VALUES (?,?,?,?,?,?)",
+				[ user ,
+				 identifier ,
+				 formatDate(date,'YYYY-MM-DD hh:mm:ss') ,
+				 identifier ,
+				 tagstring + ' twitter_posted ',
+				 body
+				] ,
+				function(err) {
+					console.log('画像なしDB投稿');
+					if(err){
+						callback(err);
+					} else {
+						callback(null);
+
+						//マルチポスト
+						mp.post(body,tags,files,null,user,function(){});
+					}
 				}
-			}
-		);
+			);
+		}
 	});
-	
-	//マルチポスト
-	mp.post(body,tags,files,user,function(){});
+
 }
+
 
 
 /**

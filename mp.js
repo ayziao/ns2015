@@ -19,13 +19,13 @@ var fs = require('fs');
 
 //npm : Node Package Manager
 var twitter = require('twitter');
-var Gyazo  = require('gyazo-api');
+//var Gyazo  = require('gyazo-api');
 
 
 /**
  * 初期化
  */
-var gyazo_client = new Gyazo(gyazokey);
+//var gyazo_client = new Gyazo(gyazokey);
 
 
 /**
@@ -33,38 +33,31 @@ var gyazo_client = new Gyazo(gyazokey);
  */
 
 //投稿
-function post(body,tags,files,user,callback){
+function post(body,tags,files,gyazores,user,callback){
 
 	//TODO サービスごとにどうにか
 
 	//Twitter
-	var twitest = new twitter(config[user]['main']['oathKeys']);
+	var twitter_api = new twitter(config[user]['main']['oathKeys']);
+
 	//FIXME 雑コーディング
 	var aaa = function(err,res){};
 	if (typeof config[user]['sub'] != "undefined") {
-		var twitestsub = new twitter(config[user]['sub']['oathKeys']);
+		var twitter_api_sub = new twitter(config[user]['sub']['oathKeys']);
+		if(gyazores){
+			aaa = function(err,res){
+				if(err){
 
-		var value = files['file'];
-		if(value.size > 0 && value.name != ''){
-			aaa = function(res){
-				gyazo_client.upload(value.path)
-				.then(function(gyazores){
-					//DEBUG あとで消す
-					console.log({gyazo_respons:'*************************',res:gyazores})
-					twitterStatusesUpdate(twitestsub, res.text + ' ' + gyazores.data.permalink_url, [], null, function(err,bbb){});
-				})
-				.catch(function(err){
-					//DEBUG あとで消す
-					console.log({err_respons:'######gyazo errrrrrrrrrrrrr#######' ,err:err}); //err.stack
-					twitterStatusesUpdate(twitestsub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
-				});
-			};
+				} else {
+					twitterStatusesUpdate(twitter_api_sub, res.text + ' ' + gyazores.data.permalink_url, [], null, function(err,bbb){});
+				}
+			}
 		} else {
 			aaa = function(err,res){
 				if(err){
 
 				} else {
-					twitterStatusesUpdate(twitestsub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
+					twitterStatusesUpdate(twitter_api_sub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
 				}
 			};
 		}
@@ -76,11 +69,11 @@ function post(body,tags,files,user,callback){
 		fs.readFile(value.path, function (err, buf) {
 			twitest.post('/media/upload.json', {media:buf}, function (err,res) {
 				console.log(res);
-				twitterStatusesUpdate(twitest,body,tags,res.media_id_string,aaa);
+				twitterStatusesUpdate(twitter_api,body,tags,res.media_id_string,aaa);
 			});
 		});
 	} else {
-		twitterStatusesUpdate(twitest,body,tags,null,aaa);
+		twitterStatusesUpdate(twitter_api,body,tags,null,aaa);
 	}
 }
 
