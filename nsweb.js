@@ -186,6 +186,10 @@ function httpPost(request, response,logs){
 		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
 		return ;
 	}
+	var redirectUrl = '';
+	if(request.url.indexOf('/@' + user + '/') == 0){
+		redirectUrl = '@' + user + '/';
+	}
 
 	form.parse(request, function( err, fields, files) {
 		console.log(files);
@@ -197,17 +201,15 @@ function httpPost(request, response,logs){
 					returnResponse(response,500,'err','txt',logs);
 					errorLog({msg:'投稿失敗',err:err});
 				} else {
-					returnResponse(response,200,'posted','txt',logs);
+					//returnResponse(response,200,'posted','txt',logs);
 				}
 			});
 		} else { //本文無しは転送
-			var redirectUrl = '';
-			if(request.url.indexOf('/@' + user + '/') == 0){
-				redirectUrl = '@' + user + '/';
-			}
 			redirect(response,303,redirectUrl,logs);
 		}
 	});
+
+	redirect(response,303,redirectUrl,logs);
 }
 
 //返送
