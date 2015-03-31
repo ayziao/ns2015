@@ -49,7 +49,7 @@ var contentType = {
 };
 
 var formHtml = (function () {/*
-		<form action="__urlbase__" method="POST" enctype="multipart/form-data">
+		<form action="./" method="POST" enctype="multipart/form-data">
 
 			<script type="text/javascript">
 				var textbox=document.getElementById('box');
@@ -136,8 +136,6 @@ function requestFromUser(request){
 	}
 }
 
-
-
 //GETリクエスト
 function httpGet(request, response,logs){
 	var user = requestFromUser(request);
@@ -180,17 +178,21 @@ function httpGet(request, response,logs){
 
 //POSTリクエスト
 function httpPost(request, response,logs){
-	var form = new formidable.IncomingForm();
-//	var user = 'test'; //FIXME ユーザー取得
 	var user = requestFromUser(request);
+	var form = new formidable.IncomingForm();
+
 	//TODO 権限チェック
+	if(user == ""){
+		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
+		return ;
+	}
 
 	form.parse(request, function( err, fields, files) {
 		console.log(files);
 		if(typeof fields.body != "undefined" && fields.body.trim() !== "" ){
 			var body = fields.body.replace(/\r\n?/g,"\n").trim();
 			var tags = fields.tags.trim().replace(/\s/, " ").replace(/\s{2,}/, " ").split(" ").filter(Boolean);
-			ns.post(body,tags,files,'test',function(err){
+			ns.post(body,tags,files,user,function(err){
 				if (err){
 					returnResponse(response,500,'err','txt',logs);
 					errorLog({msg:'投稿失敗',err:err});
@@ -199,7 +201,11 @@ function httpPost(request, response,logs){
 				}
 			});
 		} else { //本文無しは転送
-			redirect(response,303,'',logs);
+			var redirectUrl = '';
+			if(request.url.indexOf('/@' + user + '/') == 0){
+				redirectUrl = '@' + user + '/';
+			}
+			redirect(response,303,redirectUrl,logs);
 		}
 	});
 }
