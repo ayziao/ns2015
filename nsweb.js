@@ -146,6 +146,9 @@ function httpGet(request, response,logs){
 		user = 'test';
 	}
 
+	//TODO 変更がなければ304
+	//TODO 静的ファイルの場合は日時とサイズ 動的ページの場合は全文のハッシュをetagにする
+
 	if (requestUrl == '/') { //トップへのアクセス
 		//タイムライン 
 		ns.timeline(user,'/','html',function(err,content){
