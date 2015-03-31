@@ -21,7 +21,7 @@ var user      = config.user || 'node';
 //コアモジュール
 var http = require('http');
 
-//npm : Node Package Manager
+//Node Package Manager
 
 //自作モジュール
 var nsweb   = require('./nsweb');

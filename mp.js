@@ -17,7 +17,7 @@ var gyazokey = require('./config.json').gyazo; //fixme DBに
 //nodeコアモジュール
 var fs = require('fs');
 
-//npm : Node Package Manager
+//Node Package Manager
 var twitter = require('twitter');
 //var Gyazo  = require('gyazo-api');
 

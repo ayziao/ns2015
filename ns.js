@@ -24,7 +24,7 @@ var gyazokey = require('./config.json').gyazo; //fixme DBに
 //nodeコアモジュール
 var fs   = require('fs');
 
-//npm : Node Package Manager
+//Node Package Manager
 var sqlite3 = require('sqlite3').verbose();
 var Gyazo  = require('gyazo-api');
 

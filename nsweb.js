@@ -92,7 +92,6 @@ var formHtml = (function () {/*
 			<input type="file" name="file" accept="image/*">
 			<input type="hidden" name="user" value="__user__">
 			<span id="strcount">文字数</span><br>
-
 		</form>	
 */}).toString().match(/\n([\s\S]*)\n/)[0];
 //console.log(formHtml);
@@ -106,7 +105,7 @@ var formHtml = (function () {/*
 var path = require('path');
 var http = require('http');
 
-//npm : Node Package Manager
+//Node Package Manager
 var formidable = require('formidable');
 
 //自作モジュール
