@@ -49,7 +49,7 @@ function post(body,tags,files,gyazores,user,callback){
 				if(err){
 
 				} else {
-					twitterStatusesUpdate(twitter_api_sub, res.text + ' ' + gyazores.data.permalink_url, [], null, function(err,bbb){});
+					twitterStatusesUpdate(twitter_api_sub, res.text + ' ' + gyazores.data.permalink_url, [], null,user, function(err,bbb){});
 				}
 			}
 		} else {
@@ -57,7 +57,7 @@ function post(body,tags,files,gyazores,user,callback){
 				if(err){
 
 				} else {
-					twitterStatusesUpdate(twitter_api_sub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
+					twitterStatusesUpdate(twitter_api_sub, res.text + config[user]['sub']['suffix'], [], null,user, function(err,bbb){});
 				}
 			};
 		}
@@ -67,17 +67,17 @@ function post(body,tags,files,gyazores,user,callback){
 	var value = files['file'];
 	if(value.size > 0 && value.name != ''){
 		fs.readFile(value.path, function (err, buf) {
-			twitest.post('/media/upload.json', {media:buf}, function (err,res) {
+			twitter_api.post('/media/upload.json', {media:buf}, function (err,res) {
 				console.log(res);
-				twitterStatusesUpdate(twitter_api,body,tags,res.media_id_string,aaa);
+				twitterStatusesUpdate(twitter_api,body,tags,res.media_id_string,user,aaa);
 			});
 		});
 	} else {
-		twitterStatusesUpdate(twitter_api,body,tags,null,aaa);
+		twitterStatusesUpdate(twitter_api,body,tags,null,user,aaa);
 	}
 }
 
-function twitterStatusesUpdate(twitterObj,body,tags,media_ids,callback){
+function twitterStatusesUpdate(twitterObj,body,tags,media_ids,user,callback){
 	
 	var tagstring = '';
 	if(tags.length > 0){
@@ -118,6 +118,20 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids,callback){
 				res:res,
 			});
 			callback(null,res);
+			if(media_ids && res.text.match(/#猫写真/)){
+				//FIXME 雑コーディング
+				var twitter_api_rt = new twitter(config[user]['rt']['oathKeys']);
+				twitter_api_rt.post('/favorites/create.json', {id:res.id_str}, function (err,favres) {
+					console.log({favo_respons:'*************************',
+						res:favres,
+					});
+				});
+				twitter_api_rt.post('/statuses/retweet/:'+ res.id_str +'.json', {id:res.id_str}, function (err,rtres) {
+					console.log({rt_respons:'*************************',
+						res:rtres,
+					});
+				});
+			}
 		}
 	});
 }
