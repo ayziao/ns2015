@@ -38,22 +38,36 @@ function post(body,tags,files,user,callback){
 	//TODO サービスごとにどうにか
 
 	//Twitter
-	var twitest = new twitter(config[user]['main']);
+	var twitest = new twitter(config[user]['main']['oathKeys']);
 	//FIXME 雑コーディング
-	var aaa = function(){};
+	var aaa = function(err,res){};
 	if (typeof config[user]['sub'] != "undefined") {
-		var twitestsub = new twitter(config[user]['sub']);
-		aaa = function(res){
-			gyazo_client.upload(files.file.path)
-			.then(function(gyazores){
-				console.error(gyazores)
-				twitterStatusesUpdate(twitestsub, res.text + ' ' + gyazores.data.permalink_url, [], null, function(){});
-			})
-			.catch(function(err){
-				console.error(err); //err.stack
-				twitterStatusesUpdate(twitestsub, res.text + ' .', [], null, function(){});
-			});
-		};
+		var twitestsub = new twitter(config[user]['sub']['oathKeys']);
+
+		var value = files['file'];
+		if(value.size > 0 && value.name != ''){
+			aaa = function(res){
+				gyazo_client.upload(value.path)
+				.then(function(gyazores){
+					//DEBUG あとで消す
+					console.log({gyazo_respons:'*************************',res:gyazores})
+					twitterStatusesUpdate(twitestsub, res.text + ' ' + gyazores.data.permalink_url, [], null, function(err,bbb){});
+				})
+				.catch(function(err){
+					//DEBUG あとで消す
+					console.log({err_respons:'######gyazo errrrrrrrrrrrrr#######' ,err:err}); //err.stack
+					twitterStatusesUpdate(twitestsub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
+				});
+			};
+		} else {
+			aaa = function(err,res){
+				if(err){
+
+				} else {
+					twitterStatusesUpdate(twitestsub, res.text + config[user]['sub']['suffix'], [], null, function(err,bbb){});
+				}
+			};
+		}
 	}
 
 	//PENDING 複数ファイル対応するか
@@ -88,6 +102,11 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids,callback){
 
 	twitterObj.post('/statuses/update.json', params, function (err,res) {
 		if (err) {
+			//DEBUG あとで消す
+			console.log({tweet_respons:'**********errrrrrrrrrr***************',
+				err:err,
+				res:res,
+			});
 			//PENDING 重複投稿をどうにか	
 			if (err.code = 187){
 				params.status += ' .'
@@ -95,21 +114,17 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids,callback){
 					console.log({tweet_respons:'*************************',
 						res:res,
 					});
-					callback(res);
+					callback(null,res);
 				});
 			} else {
-				//DEBUG あとで消す
-				console.log({tweet_respons:'**********errrrrrrrrrr***************',
-					err:err,
-					res:res,
-				});
+				callback(err,res);
 			}
 		} else {
 			//DEBUG あとで消す
 			console.log({tweet_respons:'*************************',
 				res:res,
 			});
-			callback(res);
+			callback(null,res);
 		}
 	});
 }
