@@ -135,9 +135,8 @@ function date2identifier(date){
  */
 
 //timeline	
-function timeline(str,type,callback){
+function timeline(user,str,type,callback){
 	db.serialize(function(){
-		var user = 'test';
 		var sql = "SELECT * FROM basedata WHERE user = '" + user 
 			+ "' AND tags NOT LIKE '% gyazo_posted %' ORDER BY identifier DESC LIMIT 100";
 		db.all(sql, function(err, rows){
@@ -159,28 +158,34 @@ function timeline(str,type,callback){
 }
 
 //コンテント取得
-function content(str,type,callback){
+function content(user,str,type,callback){
 	//TODO サイトIDどうするか
 	//TODO コマンドテーブルチェック
 	//静的ファイルチェック
-	var filePath = staticDir + 'default' + str;
+	var filePath = staticDir + 'sites/' + user + str;
 	fs.readFile(filePath, function (err, buf) {
-		if (err) { //静的ファイル無し
-			//データテーブルチェック
-			db.serialize(function(){
-				var user = 'test';
-				var sql = "SELECT * FROM basedata WHERE identifier = '"
-					+ str.slice(1) +"' AND user = '"
-					+ user +"' ORDER BY identifier DESC LIMIT 1";
-				db.all(sql, function(err, rows){
-					if (!err) {
-						callback(null,JSON.stringify(rows[0],null,"\t"));
-					} else {
-						callback(err,null);
-					}
-				});
+		if (err) { //静的ユーザファイル無し
+			filePath = staticDir + 'default' + str;
+			fs.readFile(filePath, function (err, buf) {
+				if (err) { //静的デフォルトファイル無し
+					//データテーブルチェック
+					db.serialize(function(){
+						var sql = "SELECT * FROM basedata WHERE identifier = '"
+							+ str.slice(1) +"' AND user = '"
+							+ user +"' ORDER BY identifier DESC LIMIT 1";
+						db.all(sql, function(err, rows){
+							if (!err) {
+								callback(null,JSON.stringify(rows[0],null,"\t"));
+							} else {
+								callback(err,null);
+							}
+						});
+					});
+				} else { //デフォルトファイルあり
+					callback(null,buf,filePath);
+				}
 			});
-		} else { //ファイルあり
+		} else { //ユーザファイルあり
 			callback(null,buf,filePath);
 		}
 	});

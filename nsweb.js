@@ -11,8 +11,9 @@
  * 設定
  */
 //PENDING 動的な設定変更を設定ファルでやるか？DBの設定テーブルでやるか？
-var config    = require('./config.json').ns;
-var staticDir = config.staticDir || './static/';
+var config     = require('./config.json').ns;
+var staticDir  = config.staticDir || './static/';
+var domainName = require('./config.json').http.domainName;
 
 /**
  * 定数的なの
@@ -115,11 +116,41 @@ var ns = require('./ns');
 /**
  * モジュールローカル関数
  */
+
+//リクエストヘッダからユーザ取得
+function requestFromUser(request){
+
+	//FIXME ポート番号指定じゃないと動かん
+	var host = request.headers.host
+	var arrayOfStrings = host.split('.' + domainName);
+	
+	if (arrayOfStrings.length == 2){
+		return arrayOfStrings[0];
+	} else {
+		var atsplit = request.url.split('@');
+		if (atsplit.length == 2){
+			return atsplit[1].split('/')[0];
+		} else {
+			return '';
+		}
+	}
+}
+
+
+
 //GETリクエスト
 function httpGet(request, response,logs){
-	if (request.url == '/') { //トップへのアクセス
+	var user = requestFromUser(request);
+	var requestUrl = request.url.replace("/@" + user, "");
+
+	//FIXME DEBUG用かな とりあえずテストユーザ入れてる
+	if(user == ""){
+		user = 'test';
+	}
+
+	if (requestUrl == '/') { //トップへのアクセス
 		//タイムライン 
-		ns.timeline('/','html',function(err,content){
+		ns.timeline(user,'/','html',function(err,content){
 			//TODO トップへのアクセス時の機能はサイト管理ユーザが設定できるようにする
 			//PENDING 権限を持ったユーザがアクセスした時にHTMLには機能を付与して表示する その方法を考える
 
@@ -129,9 +160,9 @@ function httpGet(request, response,logs){
 		});
 	} else { //トップ以外
 		//FIXME 拡張子関連
-		ns.content(request.url,'txt',function(err,content,filePath){
+		ns.content(user,requestUrl,'txt',function(err,content,filePath){
 			if (content != null){
-				var extname = path.extname(request.url).replace(".", '');
+				var extname = path.extname(requestUrl).replace(".", '');
 				if(extname == ''){
 					extname = 'txt';
 				}
@@ -150,7 +181,8 @@ function httpGet(request, response,logs){
 //POSTリクエスト
 function httpPost(request, response,logs){
 	var form = new formidable.IncomingForm();
-	var user = 'test'; //FIXME ユーザー取得
+//	var user = 'test'; //FIXME ユーザー取得
+	var user = requestFromUser(request);
 	//TODO 権限チェック
 
 	form.parse(request, function( err, fields, files) {
