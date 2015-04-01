@@ -130,6 +130,20 @@ function date2identifier(date){
 	return formatDate(tmpdate,'YYYYMMDDhhmmss' + microtime);
 }
 
+function fileStat(err,content,contentStatus,callback){
+	fs.stat(contentStatus.filePath,  function (err, stats) {
+		if(!err){
+			contentStatus['etag'] = stats.mtime + stats.size;
+		}
+	
+		//DEBUG あとで消す
+		console.log({fileStat:'*************************',
+			contentStatus:contentStatus,
+		});
+		callback(null,content,contentStatus);
+	});
+}
+
 /**
  * モジュール公開関数
  */
@@ -192,20 +206,6 @@ function content(user,path,type,callback){
 	});
 }
 
-function fileStat(err,content,contentStatus,callback){
-	fs.stat(contentStatus.filePath,  function (err, stats) {
-		if(!err){
-			contentStatus['etag'] = stats.mtime + stats.size;
-		}
-	
-		//DEBUG あとで消す
-		console.log({fileStat:'*************************',
-			contentStatus:contentStatus,
-		});
-		callback(null,content,contentStatus);
-	});
-}
-
 //投稿
 function post(body,tags,files,user,callback){
 	var date = new Date();
@@ -224,7 +224,7 @@ function post(body,tags,files,user,callback){
 		//PENDING mpへの指示はキューを通してやるようにする？
 		var value = files['file'];
 		if(value.size > 0 && value.name != ''){
-			gyazo_client.upload(files.file.path)
+			gyazo_client.upload(value.path)
 			.then(function(gyazores){
 				//DEBUG あとで消す
 				console.log({
