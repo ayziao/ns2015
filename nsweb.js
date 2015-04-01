@@ -161,14 +161,14 @@ function httpGet(request, response,logs){
 		});
 	} else { //トップ以外
 		//FIXME 拡張子関連
-		ns.content(user,requestUrl,'txt',function(err,content,filePath){
+		ns.content(user,requestUrl,'txt',function(err,content,contentStatus){
 			if (content != null){
 				var extname = path.extname(requestUrl).replace(".", '');
 				if(extname == ''){
 					extname = 'txt';
 				}
-				if (filePath) {
-					logs.msg += ' readFile:' + filePath;
+				if (contentStatus.filePath) {
+					logs.msg += ' readFile:' + contentStatus.filePath;
 				}
 				returnResponse(response,200,content,extname,logs);
 			} else {
@@ -217,6 +217,8 @@ function httpPost(request, response,logs){
 
 //返送
 function returnResponse(response,statusCode,content,type,logs){
+
+	//TODO etag
 	response.writeHead(statusCode, {'Content-Type': contentType[type]});
 	response.end(content);
 

@@ -158,36 +158,51 @@ function timeline(user,str,type,callback){
 }
 
 //コンテント取得
-function content(user,str,type,callback){
+function content(user,path,type,callback){
 	//TODO サイトIDどうするか
 	//TODO コマンドテーブルチェック
 	//静的ファイルチェック
-	var filePath = staticDir + 'sites/' + user + str;
+	var filePath = staticDir + 'sites/' + user + path;
 	fs.readFile(filePath, function (err, buf) {
 		if (err) { //静的ユーザファイル無し
-			filePath = staticDir + 'default' + str;
+			filePath = staticDir + 'default' + path;
 			fs.readFile(filePath, function (err, buf) {
 				if (err) { //静的デフォルトファイル無し
 					//データテーブルチェック
 					db.serialize(function(){
 						var sql = "SELECT * FROM basedata WHERE identifier = '"
-							+ str.slice(1) +"' AND user = '"
+							+ path.slice(1) +"' AND user = '"
 							+ user +"' ORDER BY identifier DESC LIMIT 1";
 						db.all(sql, function(err, rows){
 							if (!err) {
-								callback(null,JSON.stringify(rows[0],null,"\t"));
+								//TODO タイプで出し分け
+								callback(null,JSON.stringify(rows[0],null,"\t"),null);
 							} else {
-								callback(err,null);
+								callback(err,null,null);
 							}
 						});
 					});
 				} else { //デフォルトファイルあり
-					callback(null,buf,filePath);
+					fileStat(null,buf,{filePath:filePath},callback);
 				}
 			});
 		} else { //ユーザファイルあり
-			callback(null,buf,filePath);
+			fileStat(null,buf,{filePath:filePath},callback);
 		}
+	});
+}
+
+function fileStat(err,content,contentStatus,callback){
+	fs.stat(contentStatus.filePath,  function (err, stats) {
+		if(!err){
+			contentStatus['etag'] = stats.mtime + stats.size;
+		}
+	
+		//DEBUG あとで消す
+		console.log({fileStat:'*************************',
+			contentStatus:contentStatus,
+		});
+		callback(null,content,contentStatus);
 	});
 }
 
