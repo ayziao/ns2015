@@ -167,7 +167,7 @@ function httpGet(request, response,logs){
 				if(extname == ''){
 					extname = 'txt';
 				}
-				if (contentStatus.filePath) {
+				if (contentStatus && contentStatus.filePath) {
 					logs.msg += ' readFile:' + contentStatus.filePath;
 				}
 				returnResponse(response,200,content,extname,logs);
