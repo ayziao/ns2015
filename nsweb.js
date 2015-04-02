@@ -157,23 +157,27 @@ function httpGet(request, response,logs){
 
 			//FIXME 投稿フォーム埋め込み
 			var reshtml = content.split("__form__").join(formHtml).split("__urlbase__").join(URL_BASE);
-			returnResponse(response,200,reshtml,'html',logs);
+			returnResponse(response,200,reshtml,{type:'html'},logs);
 		});
 	} else { //トップ以外
+
+		//TODO etagが送られてきたら
+
 		//FIXME 拡張子関連
-		ns.content(user,requestUrl,'txt',function(err,content,contentStatus){
+		var extname = path.extname(requestUrl).replace(".", '');
+		console.log(extname);
+		if(extname == ''){
+			extname = 'txt';
+		}
+		ns.content(user,requestUrl,extname,function(err,content,contentStatus){
 			if (content != null){
-				var extname = path.extname(requestUrl).replace(".", '');
-				if(extname == ''){
-					extname = 'txt';
-				}
 				if (contentStatus && contentStatus.filePath) {
 					logs.msg += ' readFile:' + contentStatus.filePath;
 				}
-				returnResponse(response,200,content,extname,logs);
+				returnResponse(response,200,content,contentStatus,logs);
 			} else {
 				//コンテントがない場合404
-				returnResponse(response,404,'404' + httpStatus[404],'txt',logs);
+				returnResponse(response,404,'404' + httpStatus[404],{type:'txt'},logs);
 			}
 		});
 	}
@@ -186,7 +190,7 @@ function httpPost(request, response,logs){
 
 	//TODO 権限チェック
 	if(user == ""){
-		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
+		returnResponse(response,405,'405' + httpStatus[403],{type:'txt'},logs);
 		return ;
 	}
 	var redirectUrl = '';
@@ -201,10 +205,10 @@ function httpPost(request, response,logs){
 			var tags = fields.tags.trim().replace(/\s/, " ").replace(/\s{2,}/, " ").split(" ").filter(Boolean);
 			ns.post(body,tags,files,user,function(err){
 				if (err){
-					returnResponse(response,500,'err','txt',logs);
+					returnResponse(response,500,'err',{type:'txt'},logs);
 					errorLog({msg:'投稿失敗',err:err});
 				} else {
-					//returnResponse(response,200,'posted','txt',logs);
+					//returnResponse(response,200,'posted',{type:'txt'},logs);
 				}
 			});
 		} else { //本文無しは転送
@@ -216,10 +220,15 @@ function httpPost(request, response,logs){
 }
 
 //返送
-function returnResponse(response,statusCode,content,type,logs){
+function returnResponse(response,statusCode,content,contentStatus,logs){
 
-	//TODO etag
-	var headers = {'Content-Type': contentType[type]};
+	var headers = {'Content-Type': contentType[contentStatus.type]};
+
+	if(typeof contentStatus.etag != "undefined" ){
+		headers['ETag'] = contentStatus.etag;
+	}
+
+	//TODO 文字系データはgzip圧縮する
 
 	response.writeHead(statusCode, headers);
 	response.end(content);
@@ -278,7 +287,7 @@ function nsweb(request, response) {
 	} else if (request.method == 'POST') { 
 		httpPost(request, response,logs);
 	} else { //非許可HTTPメソッドは405
-		returnResponse(response,405,'405' + httpStatus[403],'txt',logs);
+		returnResponse(response,405,'405' + httpStatus[403],{type:'txt'},logs);
 	}
 
 	//TODO あとで消す デバッグ用
