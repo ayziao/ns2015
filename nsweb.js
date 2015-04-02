@@ -219,7 +219,9 @@ function httpPost(request, response,logs){
 function returnResponse(response,statusCode,content,type,logs){
 
 	//TODO etag
-	response.writeHead(statusCode, {'Content-Type': contentType[type]});
+	var headers = {'Content-Type': contentType[type]};
+
+	response.writeHead(statusCode, headers);
 	response.end(content);
 
 	logs.statusCode = statusCode;
