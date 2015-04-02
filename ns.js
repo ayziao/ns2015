@@ -133,6 +133,7 @@ function date2identifier(date){
 function fileStat(err,content,contentStatus,callback){
 	fs.stat(contentStatus.filePath,  function (err, stats) {
 		if(!err){
+			//FIXME etag生成はnswebでやる コマンドラインとかでも使いやすいようにファイル情報は全部つけて返す
 			contentStatus['etag'] = stats.mtime + stats.size;
 		} else {
 			console.log({fileStat:'**************errrrrrrrr***********',
@@ -141,7 +142,8 @@ function fileStat(err,content,contentStatus,callback){
 		}
 	
 		//DEBUG あとで消す
-		console.log({fileStat:'**************aaaa***********',
+		console.log({fileStat:'*************************',
+			stats:stats,
 			contentStatus:contentStatus,
 		});
 		callback(null,content,contentStatus);

@@ -161,20 +161,23 @@ function httpGet(request, response,logs){
 		});
 	} else { //トップ以外
 
-		//TODO etagが送られてきたら
-
 		//FIXME 拡張子関連
 		var extname = path.extname(requestUrl).replace(".", '');
 		console.log(extname);
 		if(extname == ''){
 			extname = 'txt';
 		}
+		//PENDING etagが静的ファイルのやつっぼかったらファイル実体は取得せずファイル情報だけ取得して比較してからファイル実体取得？		
 		ns.content(user,requestUrl,extname,function(err,content,contentStatus){
 			if (content != null){
 				if (contentStatus && contentStatus.filePath) {
 					logs.msg += ' readFile:' + contentStatus.filePath;
 				}
-				returnResponse(response,200,content,contentStatus,logs);
+				if( request.headers['if-none-match'] === contentStatus.etag ) {
+					returnResponse(response,304,content,contentStatus,logs);
+				} else {
+					returnResponse(response,200,content,contentStatus,logs);
+				}
 			} else {
 				//コンテントがない場合404
 				returnResponse(response,404,'404' + httpStatus[404],{type:'txt'},logs);
@@ -231,7 +234,11 @@ function returnResponse(response,statusCode,content,contentStatus,logs){
 	//TODO 文字系データはgzip圧縮する
 
 	response.writeHead(statusCode, headers);
-	response.end(content);
+	if (statusCode == 304){
+		response.end();
+	} else {
+		response.end(content);
+	}
 
 	logs.statusCode = statusCode;
 	accessLog(logs);
