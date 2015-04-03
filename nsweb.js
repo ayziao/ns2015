@@ -105,6 +105,7 @@ var formHtml = (function () {/*
 //nodeコアモジュール
 var path = require('path');
 var http = require('http');
+var zlib = require('zlib');
 
 //Node Package Manager
 var formidable = require('formidable');
@@ -173,7 +174,7 @@ function httpGet(request, response,logs){
 				if (contentStatus && contentStatus.filePath) {
 					logs.msg += ' readFile:' + contentStatus.filePath;
 				}
-				if( request.headers['if-none-match'] === contentStatus.etag ) {
+				if( request.headers['if-none-match'] && request.headers['if-none-match'] === contentStatus.etag ) {
 					returnResponse(response,304,content,contentStatus,logs);
 				} else {
 					returnResponse(response,200,content,contentStatus,logs);
@@ -246,8 +247,8 @@ function returnResponse(response,statusCode,content,contentStatus,logs){
 	        });
 		} else {
 			response.writeHead(statusCode, headers);
-		response.end(content);
-	}
+			response.end(content);
+		}
 	}
 
 	logs.statusCode = statusCode;
