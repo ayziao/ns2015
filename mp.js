@@ -118,15 +118,27 @@ function twitterStatusesUpdate(twitterObj,body,tags,media_ids,user,callback){
 				res:res,
 			});
 			callback(null,res);
-			if(media_ids && res.text.match(/#猫写真/)){
+			if(media_ids && typeof config[user]['rt'] != "undefined" && res.text.match(/#猫写真/)){
 				//FIXME 雑コーディング
 				var twitter_api_rt = new twitter(config[user]['rt']['oathKeys']);
 				twitter_api_rt.post('/favorites/create.json', {id:res.id_str}, function (err,favres) {
+					if(err){
+						//DEBUG あとで消す
+						console.log({fav_respons:'**********errrrrrrrrrr***************',
+							err:err,
+						});						
+					}
 					console.log({favo_respons:'*************************',
 						res:favres,
 					});
 				});
-				twitter_api_rt.post('/statuses/retweet/:'+ res.id_str +'.json', {id:res.id_str}, function (err,rtres) {
+				twitter_api_rt.post('/statuses/retweet/'+ res.id_str +'.json', {id:res.id_str}, function (err,rtres) {
+					if(err){
+						//DEBUG あとで消す
+						console.log({rt_respons:'**********errrrrrrrrrr***************',
+							err:err,
+						});						
+					}
 					console.log({rt_respons:'*************************',
 						res:rtres,
 					});
