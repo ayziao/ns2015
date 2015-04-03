@@ -179,8 +179,9 @@ function timeline(user,str,type,callback){
 
 //コンテント取得
 function content(user,path,type,callback){
-	//TODO サイトIDどうするか
+	//PENDING サイトIDどうするか
 	//TODO コマンドテーブルチェック
+	
 	//静的ファイルチェック
 	var filePath = staticDir + 'sites/' + user + path;
 
