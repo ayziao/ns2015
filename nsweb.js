@@ -242,10 +242,12 @@ function returnResponse(response,statusCode,content,contentStatus,logs){
 		if(contentType[contentStatus.type].indexOf('text/') == 0){
 	        zlib.gzip(content, function(_, result){
 				headers['content-encoding'] = 'gzip';
+				headers['Content-Length'] = result.length;
 				response.writeHead(statusCode, headers);
 				response.end(result);
 	        });
 		} else {
+			headers['Content-Length'] = content.length;
 			response.writeHead(statusCode, headers);
 			response.end(content);
 		}
