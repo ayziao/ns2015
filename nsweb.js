@@ -231,13 +231,23 @@ function returnResponse(response,statusCode,content,contentStatus,logs){
 		headers['ETag'] = contentStatus.etag;
 	}
 
-	//TODO 文字系データはgzip圧縮する
-
-	response.writeHead(statusCode, headers);
+	//TODO content-length
+	//PENDING writeHeadの位置をどうにか
 	if (statusCode == 304){
+		response.writeHead(statusCode, headers);
 		response.end();
 	} else {
+		//文字系データはgzip圧縮する
+		if(contentType[contentStatus.type].indexOf('text/') == 0){
+	        zlib.gzip(content, function(_, result){
+				headers['content-encoding'] = 'gzip';
+				response.writeHead(statusCode, headers);
+				response.end(result);
+	        });
+		} else {
+			response.writeHead(statusCode, headers);
 		response.end(content);
+	}
 	}
 
 	logs.statusCode = statusCode;
