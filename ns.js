@@ -15,7 +15,7 @@
 var config    = require('./config.json').ns;
 var dbf = config.db || 'db.sqlite3';
 var staticDir = config.staticDir || './static/';
-var gyazokey = require('./config.json').gyazo; //fixme DBに
+var gyazokey = require('./config.json').gyazo; //fixme DBに //TODO nsではローカル保存 外部サービス利用はmpで
 
 
 /**
@@ -26,7 +26,7 @@ var fs   = require('fs');
 
 //Node Package Manager
 var sqlite3 = require('sqlite3').verbose();
-var Gyazo  = require('gyazo-api');
+var Gyazo  = require('gyazo-api'); //TODO nsではローカル保存 外部サービス利用はmpで
 
 //自作モジュール
 var mp = require('./lib/mp');
@@ -36,7 +36,7 @@ var mp = require('./lib/mp');
  * 定数的なの
  */
 
-//投稿画面HTML //PENDING webで動かしてる時しか投稿フォームとか表示しない？	
+//投稿画面HTML
 var tophtml = (function () {/*
 <!DOCTYPE html>
 <html>
@@ -76,6 +76,8 @@ var gyazo_client = new Gyazo(gyazokey);
  * @param  {Date}   date     日付
  * @param  {String} [format] フォーマット
  * @return {String}          フォーマット済み日付
+ * 
+ * //PENDING ユーティリティに移動？
  */
 var formatDate = function (date, format) {
 	if (!format) format = 'YYYY-MM-DD hh:mm:ss.SSS';
@@ -315,10 +317,7 @@ function post(body,tags,files,user,callback){
 			);
 		}
 	});
-
 }
-
-
 
 /**
  * エクスポート
