@@ -29,7 +29,7 @@ var sqlite3 = require('sqlite3').verbose();
 var Gyazo  = require('gyazo-api');
 
 //自作モジュール
-var mp = require('./mp');
+var mp = require('./lib/mp');
 
 
 /**
@@ -181,7 +181,7 @@ function timeline(user,str,type,callback){
 function content(user,path,type,callback){
 	//PENDING サイトIDどうするか
 	//TODO コマンドテーブルチェック
-	
+
 	//静的ファイルチェック
 	var filePath = staticDir + 'sites/' + user + path;
 
