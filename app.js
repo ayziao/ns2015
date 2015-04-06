@@ -2,7 +2,7 @@
 
 /**
  * アプリケーション
- * 
+ *
  * httpサーバ起動するだけ
  */
 
@@ -23,9 +23,9 @@ var http = require('http');
 
 //Node Package Manager
 
+
 //自作モジュール
 var nsweb   = require('./nsweb');
-
 
 /**
  * HTTPサーバ起動
