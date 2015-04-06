@@ -50,13 +50,22 @@ var contentType = {
 
 var formHtml = (function () {/*
 		<form action="./" method="POST" enctype="multipart/form-data">
+			<textarea id="box" style="width:100%;" rows="4" name="body" onKeyup="mojilenbody(value);"></textarea>
+			tag<input type="text" name="tags" onKeyup="mojilentag(value);">
+			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
+			<input type="file" name="file" accept="image/*">
+			<input type="hidden" name="user" value="__user__">
+			<span id="strcount">文字数</span><br>
 
 			<script type="text/javascript">
+				var key = "none";
+				var sbmit = false;
 				var textbox=document.getElementById('box');
 				var submitButton=document.getElementById('btn');
-				
-				textbox.addEventListener(
-					'keydown',
+				var bodylen = 0;
+				var taglen = 0;
+
+				textbox.addEventListener('keydown',
 					function(e){
 						key = e.which;
 						if(sbmit==false&&e.metaKey&&e.which==13) {
@@ -67,12 +76,6 @@ var formHtml = (function () {/*
 					false
 				)
 
-				var key = "none";
-				var sbmit = false;
-
-				var bodylen = 0;
-				var taglen = 0;
-
 				function showmojilen(){
 					var strlen = bodylen + taglen;
 					document.getElementById('strcount').innerHTML="<span style='font-weight: bold;color:blue ;'>"+strlen+"</span>文字 " + key;
@@ -80,19 +83,15 @@ var formHtml = (function () {/*
 				
 				function mojilenbody(str){
 					bodylen = str.length;
+					showmojilen();
 				}
 
 				function mojilentag(str){
 					taglen = str.length;
+					showmojilen();
 				}
 			</script>
 
-			<textarea id="box" style="width:100%;" rows="4" name="body" onKeyup="mojilenbody(value);"></textarea>
-			tag<input type="text" name="tags" onKeyup="mojilentag(value);">
-			<input id="btn" type="submit" name="submit" value="post" style="width: 100px;height: 60px;font-size: 2em;">
-			<input type="file" name="file" accept="image/*">
-			<input type="hidden" name="user" value="__user__">
-			<span id="strcount">文字数</span><br>
 		</form>	
 */}).toString().match(/\n([\s\S]*)\n/)[0];
 //console.log(formHtml);
