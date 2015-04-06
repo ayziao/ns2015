@@ -1,7 +1,8 @@
 {
 	"http" : {
 		"port" : 80 ,
-		"user" : "node" 
+		"user" : "node" ,
+		"domainName" : "example.co.jp" 
 	} ,
 	"ns" : {
 		"staticDir" : "./static/" ,
