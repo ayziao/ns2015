@@ -1,3 +1,5 @@
+/* global require, process */
+
 'use strict';
 
 /**
@@ -10,7 +12,7 @@
 /**
  * 設定
  */
-var config = require('./config.json').http;
+var config = require('./config/config.json').http;
 var port   = config.port || process.env.PORT || 8080;
 var user   = config.user || 'node';
 
@@ -25,15 +27,17 @@ var http = require('http');
 
 
 //自作モジュール
-var nsweb = require('./nsweb');
+var nsweb = require('./lib/nsweb');
 
 /**
  * HTTPサーバ起動
  */
 http.createServer(nsweb).listen(port, function () {
 	console.log('ポート' + port + 'でHTTP接続待ち受け開始 ' + (new Date()).toISOString());
-	if (port < 1025 && user != 'root') {
+	if (port < 1025 && user !== 'root') {
 		process.setuid(user);
 		console.log('実行ユーザを' + user + 'に変更');
 	}
 });
+
+console.log(process.env);
