@@ -163,7 +163,6 @@ function httpGet(request, response,logs){
 
 		//FIXME 拡張子関連
 		var extname = path.extname(requestUrl).replace(".", '');
-		console.log(extname);
 		if(extname == ''){
 			extname = 'txt';
 		}
@@ -314,9 +313,9 @@ function nsweb(request, response) {
 	console.log({
 		request            : "######################################" ,
 		requestTime        : requestTime ,
-		url                : request.url ,
-		headers            : request.headers ,
-		http               : 'v' + request.httpVersion + ' ' + request.method ,
+//		url                : request.url ,
+//		headers            : request.headers ,
+//		http               : 'v' + request.httpVersion + ' ' + request.method ,
 		idleStart          : Date(request.client._idleStart) ,
 		monotonicStartTime : request.client._monotonicStartTime ,
 	});
