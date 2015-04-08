@@ -13,7 +13,7 @@
  * 設定
  */
 var config = require('./config/config.json').http;
-var port   = config.port || process.env.PORT || 8080;
+var port   = process.argv[2] || process.env.PORT || config.port || 8080; //PENDING コマンドライン引数ちゃんと考える
 var user   = config.user || 'node';
 
 
@@ -40,4 +40,6 @@ http.createServer(nsweb).listen(port, function () {
 	}
 });
 
-console.log(process.env);
+//DEBUG あとで消す
+console.log('env: ',process.env);
+console.log('args: ', process.argv);
