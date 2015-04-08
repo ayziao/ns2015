@@ -13,7 +13,7 @@
  * 設定
  */
 var config = require('./config/config.json').http;
-var port   = process.argv[2] || process.env.PORT || config.port || 8080; //PENDING コマンドライン引数ちゃんと考える
+var port   = process.env.PORT || process.argv[2] || config.port || 8080; //PENDING コマンドライン引数ちゃんと考える
 var user   = config.user || 'node';
 
 
