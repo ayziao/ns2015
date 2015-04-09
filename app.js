@@ -1,15 +1,15 @@
 /* global require, process */
 
-'use strict';
-
-/**
- * アプリケーション
+/*
+ * node.jsアプリケーション
  *
  * httpサーバ起動するだけ
  */
 
+'use strict';
 
-/**
+
+/*
  * 設定
  */
 var config = require('./config/config.json').http;
@@ -17,7 +17,7 @@ var port   = process.env.PORT || process.argv[2] || config.port || 8080; //PENDI
 var user   = config.user || 'node';
 
 
-/**
+/*
  * モジュール
  */
 //コアモジュール
@@ -25,9 +25,9 @@ var http = require('http');
 
 //Node Package Manager
 
-
 //自作モジュール
 var nsweb = require('./lib/nsweb');
+
 
 /**
  * HTTPサーバ起動
@@ -41,5 +41,5 @@ http.createServer(nsweb).listen(port, function () {
 });
 
 //DEBUG あとで消す
-console.log('env: ',process.env);
+console.log({env:process.env});
 console.log('args: ', process.argv);
