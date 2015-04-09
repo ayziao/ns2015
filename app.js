@@ -29,7 +29,7 @@ var http = require('http');
 var nsweb = require('./lib/nsweb');
 
 
-/**
+/*
  * HTTPサーバ起動
  */
 http.createServer(nsweb).listen(port, function () {
