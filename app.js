@@ -1,12 +1,11 @@
 /* global require, process */
+'use strict';
 
 /*
  * node.jsアプリケーション
  *
  * httpサーバ起動するだけ
  */
-
-'use strict';
 
 
 /*
