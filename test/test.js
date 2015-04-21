@@ -14,6 +14,7 @@ var aaa = function () {
 //aaa();
 
 
+console.log('utility');
 function test_templateReplace() {
 	console.info('test_templateReplace');
 
@@ -27,10 +28,7 @@ function test_templateReplace() {
 			.split("__OTHER__").join('');
 
 	var out = templateReplace(tpl, re);
-	console.assert(out == mean, {test_templateReplace: 'テンプレート置換', out: out, mean: mean});
-
-	//TODO Objectにないの消す
-
+	console.assert(out === mean, {test_templateReplace: 'テンプレート置換', out: out, mean: mean});
 }
 test_templateReplace();
 
