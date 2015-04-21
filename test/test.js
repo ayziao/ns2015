@@ -27,8 +27,17 @@ function test_templateReplace() {
 			.split("__othe__").join('')
 			.split("__OTHER__").join('');
 
-	var out = templateReplace(tpl, re);
-	console.assert(out === mean, {test_templateReplace: 'テンプレート置換', out: out, mean: mean});
+	var out = templateReplace(tpl, re, true);
+	console.assert(out === mean, {test_templateReplace: 'テンプレート置換 変数消す', out: out, mean: mean});
+	
+	var mean2 = tpl.split("__body__").join('本文')
+			.split("__footer__").join('フッタ');
+
+	var out2 = templateReplace(tpl, re);
+	console.assert(out2 === mean2, {test_templateReplace: 'テンプレート置換 変数残す', out: out, mean: mean});
+
+//	console.log(out);
+//	console.log(out2);
 }
 test_templateReplace();
 
