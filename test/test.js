@@ -1,18 +1,43 @@
+/* global require */
+
 'use strict';
 console.log('test');
 
-//一時的なテストコード
+//一時的な確認用コード
 var aaa = function () {
+	console.log('date型');
 	var date = new Date();
-	console.log(Object.prototype.toString.call(date));
-	console.log(Object.prototype.toString.call(date));
 	console.log(date);
+	console.log(Object.prototype.toString.call(date));
+	console.log('###########################');
 };
 //aaa();
 
 
-//PENDING 設定ファイルを再起動せずに再読み込みできるようにするか
+function test_templateReplace(){
+	console.info('test_templateReplace');
+	
+	var templateReplace = require('../lib/utility').templateReplace;
+	
 
+	var tpl = 'テンプレート __body__ ほげほげ __footer__ __othe__';	
+	var re = {body:'本文',footer:'フッタ'};
+	var mean = tpl.split("__body__").join('本文')
+			.split("__footer__").join('フッタ');
+//			.split("__othe__").join('');
+
+	var out = templateReplace(tpl,re);
+	
+	console.assert(out == mean, {test_templateReplace:'テンプレート置換',out:out,mean:mean});
+
+	//TODO Objectにないの消す
+
+};
+test_templateReplace();
+
+
+//PENDING 設定ファイルを再起動せずに再読み込みできるようにするか
+//PENDING テストランナーどうしよう 
 
 
 //階層構造あるObjectぐるぐるして 1次元のObjectに積む
@@ -52,11 +77,10 @@ function test_tree2flat() {
 	//TODO 2階層以上テスト
 	//TODO 配列テスト
 
-	console.log(target);
+	//console.log(target);
 
 //	target = {debug: 332232};
 //	addObj = {aaa: {bb1: 1, bb2: 2}, ccc: [1, 2, {hoge: 'piyo'}], f: function () {}};
 
 }
-
 test_tree2flat();
