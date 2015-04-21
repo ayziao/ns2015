@@ -15,26 +15,31 @@ var aaa = function () {
 
 
 console.log('utility');
+
 function test_templateReplace() {
 	console.info('test_templateReplace');
 
 	var templateReplace = require('../lib/utility').templateReplace;
 
-	var tpl = ' __othe__ テンプレート __body__ ほげほげ __footer__ __othe__ __othe__ __OTHER__';
-	var re = {body: '本文', footer: 'フッタ'};
+	var tpl = ' __othe__ テンプレート __aa_bb__  __cc-dd__ __日本語__ __body__ ほげほげ __footer__ __othe__ __othe__ __OTHER__ __other1__ __other2__';
+	var re = {body: '本文', footer: 'フッタ', '日本語': 'Japanese', aa_bb: 'aabb', 'cc-dd': 'ccdd'};
 	var mean = tpl.split("__body__").join('本文')
 			.split("__footer__").join('フッタ')
+			.split("__aa_bb__").join('aabb')
 			.split("__othe__").join('')
+			.split("__other1__").join('')
+			.split("__other2__").join('')
 			.split("__OTHER__").join('');
 
 	var out = templateReplace(tpl, re, true);
 	console.assert(out === mean, {test_templateReplace: 'テンプレート置換 変数消す', out: out, mean: mean});
-	
+
 	var mean2 = tpl.split("__body__").join('本文')
-			.split("__footer__").join('フッタ');
+			.split("__footer__").join('フッタ')
+			.split("__aa_bb__").join('aabb');
 
 	var out2 = templateReplace(tpl, re);
-	console.assert(out2 === mean2, {test_templateReplace: 'テンプレート置換 変数残す', out: out, mean: mean});
+	console.assert(out2 === mean2, {test_templateReplace: 'テンプレート置換 変数残す', out: out2, mean: mean2});
 
 //	console.log(out);
 //	console.log(out2);
