@@ -14,30 +14,30 @@ var aaa = function () {
 //aaa();
 
 
-function test_templateReplace(){
+function test_templateReplace() {
 	console.info('test_templateReplace');
-	
+
 	var templateReplace = require('../lib/utility').templateReplace;
-	
 
-	var tpl = 'テンプレート __body__ ほげほげ __footer__ __othe__';	
-	var re = {body:'本文',footer:'フッタ'};
+	var tpl = ' __othe__ テンプレート __body__ ほげほげ __footer__ __othe__ __othe__ __OTHER__';
+	var re = {body: '本文', footer: 'フッタ'};
 	var mean = tpl.split("__body__").join('本文')
-			.split("__footer__").join('フッタ');
-//			.split("__othe__").join('');
+			.split("__footer__").join('フッタ')
+			.split("__othe__").join('')
+			.split("__OTHER__").join('');
 
-	var out = templateReplace(tpl,re);
-	
-	console.assert(out == mean, {test_templateReplace:'テンプレート置換',out:out,mean:mean});
+	var out = templateReplace(tpl, re);
+	console.assert(out == mean, {test_templateReplace: 'テンプレート置換', out: out, mean: mean});
 
 	//TODO Objectにないの消す
 
-};
+}
 test_templateReplace();
 
 
+
 //PENDING 設定ファイルを再起動せずに再読み込みできるようにするか
-//PENDING テストランナーどうしよう 
+//PENDING テストランナーどうしよう
 
 
 //階層構造あるObjectぐるぐるして 1次元のObjectに積む
