@@ -28,7 +28,11 @@ var _グローバル調べ = function () {
 //_グローバル調べ();
 
 
-var utility = require('./utility');
+function testRunner(module) {
+	for (var key in module) {
+		console.log(key);
+		module[key]();
+	}
+}
 
-utility.test_templateReplace();
-utility.test_tree2flat();
+testRunner(require('./utility'));

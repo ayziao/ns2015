@@ -3,8 +3,6 @@
 
 //テンプレート置換
 function test_templateReplace() {
-	console.info('test_templateReplace');
-
 	var templateReplace = require('../lib/utility').templateReplace;
 
 	var tpl = ' __othe__ テンプレート __aa_bb__  __cc-dd__ __日本語__ __body__ ほげほげ __footer__ __othe__ __othe__ __OTHER__ __other1__ __other2__';
@@ -34,7 +32,6 @@ function test_templateReplace() {
 
 //階層構造あるObjectぐるぐるして 1次元のObjectに積む
 function test_tree2flat() {
-	console.info('test_tree2flat');
 	var tree2flat = require('../lib/utility').tree2flat;
 	var formatDate = require('../lib/utility').formatDate;
 
