@@ -78,3 +78,10 @@ module.exports = {
 	test_templateReplace: test_templateReplace,
 	test_tree2flat      : test_tree2flat
 };
+
+if(module === require.main){
+	for (var key in module.exports) {	
+		console.log(key);
+		module.exports[key]();
+	}
+}
