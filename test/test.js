@@ -27,6 +27,58 @@ var _グローバル調べ = function () {
 }
 //_グローバル調べ();
 
+var _this調べ = function () {
+	var gdgdgd = function () {
+		gkgkgkg();
+		console.log(this);
+	}
+
+	var gkgkgkg = function () {
+		console.log(this);
+	}
+
+	console.log(this);
+	gdgdgd();
+
+	function bbb() {
+		var aaa = 1;
+
+		return function () {
+			var fff = 1;
+			console.log(this);
+
+		};
+	}
+
+	var cc = new bbb();
+	cc();
+
+
+//メソッド呼び出しパターン
+	var myObject = {
+		value: 10,
+		show: function () {
+			console.log(this);
+			console.log(this.value);
+		}
+	};
+	myObject.show(); // 10
+
+	this.aaa = 'aaa';
+
+
+	var gegege = "gegege";
+
+	console.log(this);
+};
+//_this調べ();
+
+var _雛型 = function () {
+	
+};
+//_雛型();
+
+
 
 function testRunner(module) {
 	for (var key in module) {
