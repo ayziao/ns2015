@@ -8,7 +8,21 @@
 毎回	ソースコミット 作業メモコミット gist等へ部分登録
 	タスク洗い出し 未分類整理
 
+### inbox
+ESLintルール調べる
+
+valid-jsdoc - JSDocのバリデーション
+block-scoped-var - varをなんとなくlet扱いするぞ
+no-process-env - process.envいじっちゃダメ
+no-warning-comments - コメントにTODOとか書くなや
+vars-on-top - varはスコープの先頭にまとめてね
+no-undefined - そのundefinedはundefinedなの
+no-sync - 同期とかウケる
+brace-style - 中括弧の前後の改行スタイルは統一してくれ
+sort-vars - 変数はソートするとわかりやすいぞ
+
 ###▼順次
+ESLintエラー削り
 個別ページ タグ追加機能
 画像静的ファイルディレクトリへ保存
 gyazo投稿をmpへ

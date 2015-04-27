@@ -3,6 +3,24 @@
 		"node": true
 	},
 	"rules": {
-			"no-multi-spaces": 1
+			"key-spacing": "オンにしたりオフにしたりしつつ確認する奴",
+			"key-spacing": 0,
+			"no-multi-spaces": 0,
+			"no-warning-comments": 0,
+			"curly": "常にエラーとして扱う追加分",
+			"curly": 2,
+			"vars-on-top": 2,
+			"valid-jsdoc": 2,
+			"sort-vars": 2,
+			"no-sync": "検討中",
+			"no-process-env": 1,
+			"no-undefined": 1,
+			"no-sync": 1,
+			"brace-style": 1,
+			"no-use-before-define": "面倒なので切っとくやつ",
+			"no-use-before-define": 0,
+			"no-underscore-dangle": 0,
+			"quotes": "シングルクォートをデフォルトに",
+			"quotes": [1,"single"]
 	}
 }
