@@ -3,6 +3,11 @@
 
 console.log('test');
 
+var ___雛型 = function () {
+	console.log(this);
+};
+//_雛型();
+
 
 //一時的な確認用コード なんか確認したらgistに書いておく
 var __一時的な確認用コード = function () {
@@ -10,9 +15,20 @@ var __一時的な確認用コード = function () {
 	var date = new Date();
 	console.log(date);
 	console.log(Object.prototype.toString.call(date));
+	var hoge = new function () {
+		var obj = {};
+		return obj;
+	};
+	console.log(Object.prototype.toString.call(hoge));
+
+
 	console.log('###########################');
 };
 //__一時的な確認用コード();
+
+
+
+
 
 
 var _グローバル調べ = function () {
@@ -26,6 +42,7 @@ var _グローバル調べ = function () {
 	console.log('###########################');
 }
 //_グローバル調べ();
+
 
 var _this調べ = function () {
 	var gdgdgd = function () {
@@ -64,7 +81,7 @@ var _this調べ = function () {
 	};
 	myObject.show(); // 10
 
-	this.aaa = 'aaa';
+	//this.aaa = 'aaa';
 
 
 	var gegege = "gegege";
@@ -73,18 +90,49 @@ var _this調べ = function () {
 };
 //_this調べ();
 
-var _雛型 = function () {
-	
+
+var _インスタンス生成調べ = function () {
+
+	function Piyo() {
+		this.obj = 'piyo';
+		return this;
+	}
+
+	function Dog(name, cry) {
+		this.name = name;
+		this.bark = function () {
+			console.log(cry);
+		};
+	}
+	var poti = new Dog();
+
+	console.log(Object.prototype.toString.call(poti));
+	console.log(typeof (poti));
+
+	var piyopiyo = new Piyo();
+	console.log(Object.prototype.toString.call(piyopiyo));
+
+
+	console.log(this);
 };
-//_雛型();
+//_インスタンス生成調べ();
+
+
+var _module調べ = function () {
+	console.log(module);
+};
+//_module調べ();
 
 
 
-function testRunner(module) {
+function testRunner(modulePath) {
+	//TODO ディレクトリぐるぐるして全部実行
+	var module = require(modulePath);
+	console.log(modulePath);
+//	console.log(module);
 	for (var key in module) {
 		console.log(key);
 		module[key]();
 	}
 }
-
-testRunner(require('./utility'));
+testRunner('./utility');
