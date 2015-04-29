@@ -70,7 +70,6 @@ function test_tree2flat() {
 
 //	target = {debug: 332232};
 //	addObj = {aaa: {bb1: 1, bb2: 2}, ccc: [1, 2, {hoge: 'piyo'}], f: function () {}};
-
 }
 
 
