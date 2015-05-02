@@ -5,10 +5,10 @@
 //配列から値を削除する
 function test_arrayDeleteValue() {
 	var arrayDeleteValue = require('../lib/utility').arrayDeleteValue;
-	
-	var test = [1,2,3];
-	var meen = [1,3];
-	var ret = arrayDeleteValue(test,2);
+
+	var test = [1, 2, 3];
+	var meen = [1, 3];
+	var ret = arrayDeleteValue(test, 2);
 
 //	console.log(test);
 //	console.log(ret);
