@@ -1,4 +1,5 @@
-/* global require */
+/* global require, module, global */
+/*eslint camelcase:0, vars-on-top:0 */
 'use strict';
 
 console.log('test');
@@ -40,34 +41,39 @@ var _グローバル調べ = function () {
 	console.log(module);
 
 	console.log('###########################');
-}
+};
 //_グローバル調べ();
 
 
 var _this調べ = function () {
+	
+	console.log('_this調べ');
+	
 	var gdgdgd = function () {
 		gkgkgkg();
 		console.log(this);
-	}
+	};
 
 	var gkgkgkg = function () {
 		console.log(this);
-	}
+	};
 
 	console.log(this);
 	gdgdgd();
 
-	function bbb() {
+	function Bbb() {
 		var aaa = 1;
+		this.aaa = aaa;
 
 		return function () {
 			var fff = 1;
+			console.log('Bbb');
 			console.log(this);
-
+			return fff + aaa;
 		};
 	}
 
-	var cc = new bbb();
+	var cc = new Bbb();
 	cc();
 
 
@@ -84,7 +90,7 @@ var _this調べ = function () {
 	//this.aaa = 'aaa';
 
 
-	var gegege = "gegege";
+	var gegege = 'gegege';
 
 	console.log(this);
 };
