@@ -12,23 +12,60 @@ var ___雛型 = function () {
 
 //一時的な確認用コード なんか確認したらgistに書いておく
 var __一時的な確認用コード = function () {
-	console.log('date型');
+	
+	var aaa = {};
+	
+	aaa.bbb = 1;
+	
+	console.log(aaa);
+	console.log(typeof ccc);
+	console.log(typeof ccc == typeof ddd);
+	
+
+	
+	console.log('###########################');
+	
+};
+__一時的な確認用コード();
+
+
+
+var _型チェック = function () {
+	console.log('Date型');
 	var date = new Date();
 	console.log(date);
 	console.log(Object.prototype.toString.call(date));
-	var hoge = new function () {
-		var obj = {};
-		return obj;
+	console.log(date instanceof Date);
+	
+	console.log(Date.prototype);
+	
+	console.log('Hoge型');
+	var Hoge = function Hoge () {
+		var obj;
+		obj = {};
+		obj.piyo = 'piyo';
+//		return obj;
+		this.obj = obj;
+//		this.toString = function(){
+//			return '[object Hoge]';
+//		}
 	};
+	
+	Hoge.prototype.toString = function(){
+			return '[object Hoge]';
+		};
+	
+	var hoge = new Hoge ();
+	
 	console.log(Object.prototype.toString.call(hoge));
+	console.log(hoge.toString());
+	console.log(hoge);
+	
+	console.log(hoge instanceof Hoge);
+	console.log(hoge instanceof Object);
 
-
-	console.log('###########################');
 };
-//__一時的な確認用コード();
-
-
-
+//_型チェック();
 
 
 
@@ -64,8 +101,8 @@ var _this調べ = function () {
 	function Bbb() {
 		var aaa = 1;
 		this.aaa = aaa;
-
-		return function () {
+		
+		this.ccc = function () {
 			var fff = 1;
 			console.log('Bbb');
 			console.log(this);
@@ -74,7 +111,7 @@ var _this調べ = function () {
 	}
 
 	var cc = new Bbb();
-	cc();
+	cc.ccc();
 
 
 //メソッド呼び出しパターン
@@ -90,7 +127,7 @@ var _this調べ = function () {
 	//this.aaa = 'aaa';
 
 
-	var gegege = 'gegege';
+	//var gegege = 'gegege';
 
 	console.log(this);
 };
@@ -101,7 +138,7 @@ var _インスタンス生成調べ = function () {
 
 	function Piyo() {
 		this.obj = 'piyo';
-		return this;
+		//return this;
 	}
 
 	function Dog(name, cry) {
@@ -110,7 +147,7 @@ var _インスタンス生成調べ = function () {
 			console.log(cry);
 		};
 	}
-	var poti = new Dog();
+	var poti = new Dog('inu','wan');
 
 	console.log(Object.prototype.toString.call(poti));
 	console.log(typeof (poti));
