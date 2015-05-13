@@ -21,12 +21,9 @@ var __一時的な確認用コード = function () {
 	console.log(typeof ccc);
 	console.log(typeof ccc == typeof ddd);
 	
-
-	
 	console.log('###########################');
-	
 };
-__一時的な確認用コード();
+//__一時的な確認用コード();
 
 
 

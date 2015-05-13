@@ -1,8 +1,8 @@
 /* global require, process */
 'use strict';
 
-/*
- * node.jsアプリケーション
+/**
+ * @fileoverview node.jsアプリケーション
  *
  * httpサーバ起動するだけ
  */
