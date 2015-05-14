@@ -1,0 +1,31 @@
+{
+  "name": "ns2015",
+  "version": "0.0.1",
+  "description": "niascape",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ayziao/ns2015.git"
+  },
+  "author": "ayziao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ayziao/ns2015/issues"
+  },
+  "homepage": "https://github.com/ayziao/ns2015#readme",
+  "devDependencies": {
+    "eslint": ">=0.0.1"
+  },
+  "peerDependencies": {
+    "formidable": ">=1.0.17",
+    "gyazo-api": ">=0.0.1",
+    "twitter": ">=1.2.5",
+    "sqlite3": ">=3.0.8"
+  }
+}

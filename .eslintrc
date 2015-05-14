@@ -18,6 +18,8 @@
 			"no-undefined": 1,
 			"no-sync": 1,
 			"brace-style": 1,
+			"camelcase": "ワーニングにしとく",
+			"camelcase": 1,
 			"no-warning-comments": "面倒なので切っとくやつ",
 			"no-warning-comments": 0,
 			"quotes": "シングルクォートをデフォルトに",
