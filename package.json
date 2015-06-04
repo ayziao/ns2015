@@ -20,11 +20,11 @@
   },
   "homepage": "https://github.com/ayziao/ns2015#readme",
   "devDependencies": {
-    "eslint": ">=0.0.1"
+    "eslint": ">=0.22.1"
   },
   "peerDependencies": {
     "formidable": ">=1.0.17",
-    "gyazo-api": ">=0.0.1",
+    "gyazo-api": ">=0.2.0",
     "twitter": ">=1.2.5",
     "sqlite3": ">=3.0.8"
   }
