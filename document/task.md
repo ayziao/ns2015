@@ -7,6 +7,9 @@
 ## ●タスク
 毎回	ソースコミット 作業メモコミット gist等へ部分登録
 	タスク洗い出し 未分類整理
+	cd /Volumes/data/dat/project/ns2015
+	eslint lib/ns.js
+
 
 ### inbox
 ESLintルール調べる
